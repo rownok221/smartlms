@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Instructor Dashboard | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h2">Instructor Dashboard</h1>
+    <p class="text-muted">Create assignments, manage courses, review submissions, and grade students.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">My Courses</h5>
+                <p class="card-text text-muted">Your assigned courses will appear here.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Assignments</h5>
+                <p class="card-text text-muted">Create and manage course assignments.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Grading Queue</h5>
+                <p class="card-text text-muted">Submitted work will later appear here for grading.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

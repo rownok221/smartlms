@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h2">Admin Dashboard</h1>
+    <p class="text-muted">Manage users, monitor the system, and control platform-level operations.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">User Management</h5>
+                <p class="card-text text-muted">Create and manage students and instructors.</p>
+                <a href="/admin/" class="btn btn-primary btn-sm">Open Admin Panel</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Courses</h5>
+                <p class="card-text text-muted">Course management module will be connected next.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Reports & Logs</h5>
+                <p class="card-text text-muted">Audit and activity reporting will be added later.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

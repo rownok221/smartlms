@@ -1,0 +1,15 @@
+body {
+    min-height: 100vh;
+}
+
+.card {
+    border-radius: 1rem;
+}
+
+.navbar-brand {
+    letter-spacing: 0.3px;
+}
+
+h1, h2, h3, h4, h5 {
+    font-weight: 700;
+}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h2">Student Dashboard</h1>
+    <p class="text-muted">View your courses, check assignment deadlines, submit work, and see grades.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">My Courses</h5>
+                <p class="card-text text-muted">Enrolled courses will appear here.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Assignments</h5>
+                <p class="card-text text-muted">Pending assignments and deadlines will be shown here.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Grades & Feedback</h5>
+                <p class="card-text text-muted">Published marks and instructor feedback will appear here.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
