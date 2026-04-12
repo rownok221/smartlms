@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.code }} | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div>
+            <span class="badge bg-primary mb-2">{{ course.code }}</span>
+            <h1 class="h2 mb-2">{{ course.title }}</h1>
+            <p class="text-muted mb-0">
+                {{ course.description|default:"No course description available yet." }}
+            </p>
+        </div>
+
+        <div>
+            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary">
+                Back to Courses
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Course Overview</h5>
+                <p class="mb-2"><strong>Course Code:</strong> {{ course.code }}</p>
+                <p class="mb-2"><strong>Created By:</strong> {{ course.created_by|default:"N/A" }}</p>
+                <p class="mb-0"><strong>Created At:</strong> {{ course.created_at }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Instructors</h5>
+                {% if instructors %}
+                    <ul class="mb-0">
+                        {% for item in instructors %}
+                            <li>{{ item.instructor.full_name|default:item.instructor.username }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No instructor assigned yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Enrolled Students</h5>
+                <p class="display-6 mb-0">{{ students|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-lg-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Student List</h5>
+
+                {% if students %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Full Name</th>
+                                    <th>Enrolled At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in students %}
+                                    <tr>
+                                        <td>{{ item.student.username }}</td>
+                                        <td>{{ item.student.full_name|default:"-" }}</td>
+                                        <td>{{ item.enrolled_at }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No students enrolled yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

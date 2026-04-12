@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Courses | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">Courses</h1>
+        <p class="text-muted mb-0">Browse and manage course spaces in SmartLMS.</p>
+    </div>
+
+    {% if can_create_course %}
+        <a href="{% url 'courses:course_create' %}" class="btn btn-primary">
+            Create Course
+        </a>
+    {% endif %}
+</div>
+
+{% if courses %}
+    <div class="row g-4">
+        {% for course in courses %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary">{{ course.code }}</span>
+                        </div>
+
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text text-muted">
+                            {{ course.description|default:"No description added yet."|truncatechars:120 }}
+                        </p>
+
+                        <div class="small text-muted mb-3">
+                            <div><strong>Instructors:</strong> {{ course.course_instructors.count }}</div>
+                            <div><strong>Students:</strong> {{ course.enrollments.count }}</div>
+                        </div>
+
+                        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-primary btn-sm">
+                            View Course
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="mb-2">No courses available</h5>
+            <p class="text-muted mb-0">
+                There are no visible courses for your account yet.
+            </p>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

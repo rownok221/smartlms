@@ -20,6 +20,14 @@
         </button>
 
         <div class="collapse navbar-collapse" id="mainNavbar">
+            {% if user.is_authenticated %}
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'courses:course_list' %}">Courses</a>
+                    </li>
+                </ul>
+            {% endif %}
+
             <ul class="navbar-nav ms-auto align-items-lg-center">
                 {% if user.is_authenticated %}
                     <li class="nav-item me-3">

@@ -16,12 +16,12 @@
                 <a href="{% url 'accounts:dashboard_redirect' %}" class="btn btn-primary btn-lg me-2">
                     Go to Dashboard
                 </a>
+                <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary btn-lg">
+                    View Courses
+                </a>
             {% else %}
                 <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg me-2">
                     Login
-                </a>
-                <a href="/admin/" class="btn btn-outline-secondary btn-lg">
-                    Django Admin
                 </a>
             {% endif %}
         </div>
@@ -43,9 +43,9 @@
     <div class="col-md-4">
         <div class="card h-100 shadow-sm border-0">
             <div class="card-body">
-                <h5 class="card-title">Assignment Workflow</h5>
+                <h5 class="card-title">Course Management</h5>
                 <p class="card-text text-muted">
-                    Students will submit assignments, instructors will review them, and grades will be published clearly.
+                    Organize course spaces, assign instructors, and manage student enrollments efficiently.
                 </p>
             </div>
         </div>
