@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Grade Submission | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                <h1 class="h3 mb-3">Grade Submission</h1>
+
+                <p class="text-muted mb-2">
+                    <strong>Course:</strong> {{ course.code }} - {{ course.title }}
+                </p>
+                <p class="text-muted mb-2">
+                    <strong>Assignment:</strong> {{ assignment.title }}
+                </p>
+                <p class="text-muted mb-4">
+                    <strong>Student:</strong> {{ submission.student.full_name|default:submission.student.username }}
+                </p>
+
+                <div class="alert alert-info">
+                    <strong>Maximum Marks:</strong> {{ assignment.max_marks }}<br>
+                    <strong>Submission Status:</strong> {{ submission.status }}<br>
+                    <strong>Submitted File:</strong>
+                    <a href="{{ submission.file.url }}" target="_blank">Open submission</a>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Marks Obtained</label>
+                        {{ form.marks_obtained }}
+                        {% if form.marks_obtained.errors %}
+                            <div class="text-danger small mt-1">{{ form.marks_obtained.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Feedback</label>
+                        {{ form.feedback }}
+                        {% if form.feedback.errors %}
+                            <div class="text-danger small mt-1">{{ form.feedback.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            {% if existing_grade %}Update Grade{% else %}Save Grade{% endif %}
+                        </button>
+                        <a href="{% url 'assignments:assignment_detail' assignment.pk %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

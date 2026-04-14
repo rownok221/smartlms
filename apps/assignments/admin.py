@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Assignment, Submission
+from .models import Assignment, Grade, Submission
 
 
 @admin.register(Assignment)
@@ -17,3 +17,11 @@ class SubmissionAdmin(admin.ModelAdmin):
     search_fields = ('assignment__title', 'assignment__course__code', 'student__username')
     list_filter = ('status', 'submitted_at')
     readonly_fields = ('submitted_at', 'last_updated_at')
+
+
+@admin.register(Grade)
+class GradeAdmin(admin.ModelAdmin):
+    list_display = ('submission', 'marks_obtained', 'graded_by', 'graded_at')
+    search_fields = ('submission__assignment__title', 'submission__student__username')
+    list_filter = ('graded_at',)
+    readonly_fields = ('graded_at',)

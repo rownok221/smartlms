@@ -74,3 +74,27 @@ class Submission(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.assignment.title}"
+
+
+class Grade(models.Model):
+    submission = models.OneToOneField(
+        Submission,
+        on_delete=models.CASCADE,
+        related_name='grade'
+    )
+    marks_obtained = models.PositiveIntegerField()
+    feedback = models.TextField(blank=True)
+    graded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='graded_submissions'
+    )
+    graded_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-graded_at']
+
+    def __str__(self):
+        return f"Grade for {self.submission.student.username} - {self.submission.assignment.title}"

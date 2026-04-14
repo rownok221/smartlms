@@ -58,7 +58,27 @@
                             <a href="{{ student_submission.file.url }}" target="_blank">Open submission</a>
                         </p>
 
-                        <a href="{% url 'assignments:submit_assignment' assignment.pk %}" class="btn btn-primary">
+                        {% if student_submission.grade %}
+                            <hr>
+                            <h6 class="mb-3">Grade & Feedback</h6>
+                            <p class="mb-2">
+                                <strong>Marks:</strong>
+                                {{ student_submission.grade.marks_obtained }} / {{ assignment.max_marks }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Feedback:</strong><br>
+                                {{ student_submission.grade.feedback|default:"No feedback provided." }}
+                            </p>
+                            <p class="mb-0">
+                                <strong>Graded At:</strong> {{ student_submission.grade.graded_at }}
+                            </p>
+                        {% else %}
+                            <div class="alert alert-secondary mt-3 mb-0">
+                                Your submission has not been graded yet.
+                            </div>
+                        {% endif %}
+
+                        <a href="{% url 'assignments:submit_assignment' assignment.pk %}" class="btn btn-primary mt-3">
                             Update Submission
                         </a>
                     {% else %}
@@ -95,8 +115,9 @@
                                         <th>Student</th>
                                         <th>Status</th>
                                         <th>Submitted At</th>
-                                        <th>Last Updated</th>
                                         <th>File</th>
+                                        <th>Grade</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -111,9 +132,21 @@
                                                 {% endif %}
                                             </td>
                                             <td>{{ submission.submitted_at }}</td>
-                                            <td>{{ submission.last_updated_at }}</td>
                                             <td>
                                                 <a href="{{ submission.file.url }}" target="_blank">Open file</a>
+                                            </td>
+                                            <td>
+                                                {% if submission.grade %}
+                                                    {{ submission.grade.marks_obtained }} / {{ assignment.max_marks }}
+                                                {% else %}
+                                                    <span class="text-muted">Not graded</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'assignments:grade_submission' submission.pk %}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    {% if submission.grade %}Update Grade{% else %}Grade{% endif %}
+                                                </a>
                                             </td>
                                         </tr>
                                     {% endfor %}

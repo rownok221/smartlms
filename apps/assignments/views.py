@@ -6,8 +6,8 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.courses.models import Course, CourseInstructor, Enrollment
 
-from .forms import AssignmentForm, SubmissionForm
-from .models import Assignment, Submission
+from .forms import AssignmentForm, GradeForm, SubmissionForm
+from .models import Assignment, Grade, Submission
 
 
 def is_admin(user):
@@ -86,12 +86,12 @@ def assignment_detail(request, pk):
         student_submission = Submission.objects.filter(
             assignment=assignment,
             student=request.user
-        ).first()
+        ).select_related('grade').first()
 
     if can_manage_course(request.user, course):
         all_submissions = Submission.objects.filter(
             assignment=assignment
-        ).select_related('student')
+        ).select_related('student').prefetch_related('grade')
 
     context = {
         'assignment': assignment,
@@ -185,3 +185,48 @@ def submit_assignment(request, pk):
         'existing_submission': existing_submission,
     }
     return render(request, 'assignments/submission_form.html', context)
+
+
+@login_required
+def grade_submission(request, submission_pk):
+    submission = get_object_or_404(
+        Submission.objects.select_related('assignment', 'assignment__course', 'student'),
+        pk=submission_pk
+    )
+    assignment = submission.assignment
+    course = assignment.course
+
+    if not can_manage_course(request.user, course):
+        messages.error(request, 'You are not authorized to grade this submission.')
+        return redirect('assignments:assignment_detail', pk=assignment.pk)
+
+    existing_grade = Grade.objects.filter(submission=submission).first()
+
+    if request.method == 'POST':
+        form = GradeForm(
+            request.POST,
+            instance=existing_grade,
+            max_marks=assignment.max_marks
+        )
+        if form.is_valid():
+            grade = form.save(commit=False)
+            grade.submission = submission
+            grade.graded_by = request.user
+            grade.save()
+
+            messages.success(request, 'Submission graded successfully.')
+            return redirect('assignments:assignment_detail', pk=assignment.pk)
+    else:
+        form = GradeForm(
+            instance=existing_grade,
+            max_marks=assignment.max_marks
+        )
+
+    context = {
+        'submission': submission,
+        'assignment': assignment,
+        'course': course,
+        'form': form,
+        'existing_grade': existing_grade,
+    }
+    return render(request, 'assignments/grade_form.html', context)
