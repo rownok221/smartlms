@@ -5,6 +5,9 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
+from apps.assignments.models import Assignment, Submission
+from apps.courses.models import Announcement, Course, CourseInstructor, Enrollment
+
 from .forms import CustomLoginForm
 from .models import User
 
@@ -50,8 +53,15 @@ def admin_dashboard(request):
         messages.error(request, 'You are not authorized to access the admin dashboard.')
         return redirect('accounts:dashboard_redirect')
 
+    recent_announcements = Announcement.objects.select_related('course', 'posted_by')[:5]
+
     context = {
         'page_title': 'Admin Dashboard',
+        'user_count': User.objects.count(),
+        'course_count': Course.objects.count(),
+        'assignment_count': Assignment.objects.count(),
+        'submission_count': Submission.objects.count(),
+        'recent_announcements': recent_announcements,
     }
     return render(request, 'accounts/admin_dashboard.html', context)
 
@@ -62,8 +72,24 @@ def instructor_dashboard(request):
         messages.error(request, 'You are not authorized to access the instructor dashboard.')
         return redirect('accounts:dashboard_redirect')
 
+    assigned_courses = Course.objects.filter(
+        course_instructors__instructor=request.user
+    ).distinct()
+
+    recent_announcements = Announcement.objects.filter(
+        course__course_instructors__instructor=request.user
+    ).select_related('course', 'posted_by').distinct()[:5]
+
     context = {
         'page_title': 'Instructor Dashboard',
+        'assigned_course_count': assigned_courses.count(),
+        'assignment_count': Assignment.objects.filter(
+            course__course_instructors__instructor=request.user
+        ).distinct().count(),
+        'submission_count': Submission.objects.filter(
+            assignment__course__course_instructors__instructor=request.user
+        ).distinct().count(),
+        'recent_announcements': recent_announcements,
     }
     return render(request, 'accounts/instructor_dashboard.html', context)
 
@@ -74,8 +100,24 @@ def student_dashboard(request):
         messages.error(request, 'You are not authorized to access the student dashboard.')
         return redirect('accounts:dashboard_redirect')
 
+    enrolled_courses = Course.objects.filter(
+        enrollments__student=request.user
+    ).distinct()
+
+    recent_announcements = Announcement.objects.filter(
+        course__enrollments__student=request.user
+    ).select_related('course', 'posted_by').distinct()[:5]
+
     context = {
         'page_title': 'Student Dashboard',
+        'enrolled_course_count': enrolled_courses.count(),
+        'assignment_count': Assignment.objects.filter(
+            course__enrollments__student=request.user
+        ).distinct().count(),
+        'submission_count': Submission.objects.filter(
+            student=request.user
+        ).count(),
+        'recent_announcements': recent_announcements,
     }
     return render(request, 'accounts/student_dashboard.html', context)
 

@@ -13,10 +13,17 @@
             </p>
         </div>
 
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
             <a href="{% url 'assignments:assignment_list' course.pk %}" class="btn btn-primary">
                 View Assignments
             </a>
+
+            {% if can_manage_course %}
+                <a href="{% url 'courses:announcement_create' course.pk %}" class="btn btn-outline-primary">
+                    Post Announcement
+                </a>
+            {% endif %}
+
             <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary">
                 Back to Courses
             </a>
@@ -31,6 +38,7 @@
                 <h5 class="card-title">Course Overview</h5>
                 <p class="mb-2"><strong>Course Code:</strong> {{ course.code }}</p>
                 <p class="mb-2"><strong>Created By:</strong> {{ course.created_by|default:"N/A" }}</p>
+                <p class="mb-2"><strong>Announcements:</strong> {{ announcements|length }}</p>
                 <p class="mb-0"><strong>Created At:</strong> {{ course.created_at }}</p>
             </div>
         </div>
@@ -64,19 +72,54 @@
 </div>
 
 <div class="row g-4 mt-1">
-    <div class="col-lg-12">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Course Announcements</h5>
+
+                {% if announcements %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for announcement in announcements %}
+                            <div class="border rounded-4 p-3 bg-light-subtle">
+                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                                    <div>
+                                        <h6 class="mb-1">{{ announcement.title }}</h6>
+                                        <div class="small text-muted">
+                                            Posted by {{ announcement.posted_by|default:"N/A" }}
+                                            • {{ announcement.created_at|date:"M d, Y h:i A" }}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        {% if announcement.is_pinned %}
+                                            <span class="badge bg-warning text-dark">Pinned</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <p class="mb-0">{{ announcement.message|linebreaksbr }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No announcements posted for this course yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
         <div class="card shadow-sm border-0">
             <div class="card-body">
                 <h5 class="card-title mb-3">Student List</h5>
 
                 {% if students %}
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
                                     <th>Username</th>
                                     <th>Full Name</th>
-                                    <th>Enrolled At</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -84,7 +127,6 @@
                                     <tr>
                                         <td>{{ item.student.username }}</td>
                                         <td>{{ item.student.full_name|default:"-" }}</td>
-                                        <td>{{ item.enrolled_at }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

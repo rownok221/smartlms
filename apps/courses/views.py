@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.accounts.models import User
 
-from .forms import CourseForm
-from .models import Course, CourseInstructor, Enrollment
+from .forms import AnnouncementForm, CourseForm
+from .models import Announcement, Course, CourseInstructor, Enrollment
 
 
 def is_admin(user):
@@ -23,15 +23,27 @@ def is_student(user):
 @login_required
 def course_list(request):
     if is_admin(request.user):
-        courses = Course.objects.all().prefetch_related('course_instructors__instructor', 'enrollments__student')
+        courses = Course.objects.all().prefetch_related(
+            'course_instructors__instructor',
+            'enrollments__student',
+            'announcements'
+        )
     elif is_instructor(request.user):
         courses = Course.objects.filter(
             course_instructors__instructor=request.user
-        ).prefetch_related('course_instructors__instructor', 'enrollments__student').distinct()
+        ).prefetch_related(
+            'course_instructors__instructor',
+            'enrollments__student',
+            'announcements'
+        ).distinct()
     else:
         courses = Course.objects.filter(
             enrollments__student=request.user
-        ).prefetch_related('course_instructors__instructor', 'enrollments__student').distinct()
+        ).prefetch_related(
+            'course_instructors__instructor',
+            'enrollments__student',
+            'announcements'
+        ).distinct()
 
     context = {
         'page_title': 'Courses',
@@ -44,7 +56,11 @@ def course_list(request):
 @login_required
 def course_detail(request, pk):
     course = get_object_or_404(
-        Course.objects.prefetch_related('course_instructors__instructor', 'enrollments__student'),
+        Course.objects.prefetch_related(
+            'course_instructors__instructor',
+            'enrollments__student',
+            'announcements__posted_by'
+        ),
         pk=pk
     )
 
@@ -63,11 +79,13 @@ def course_detail(request, pk):
 
     instructors = CourseInstructor.objects.filter(course=course).select_related('instructor')
     students = Enrollment.objects.filter(course=course).select_related('student')
+    announcements = Announcement.objects.filter(course=course).select_related('posted_by')
 
     context = {
         'course': course,
         'instructors': instructors,
         'students': students,
+        'announcements': announcements,
         'can_manage_course': is_admin(request.user) or is_instructor(request.user),
     }
     return render(request, 'courses/course_detail.html', context)
@@ -101,4 +119,32 @@ def course_create(request):
         'page_title': 'Create Course',
         'form': form,
     }
-    return render(request, 'courses/course_detail.html', context)
+    return render(request, 'courses/course_form.html', context)
+
+
+@login_required
+def announcement_create(request, course_pk):
+    course = get_object_or_404(Course, pk=course_pk)
+
+    if not (is_admin(request.user) or CourseInstructor.objects.filter(course=course, instructor=request.user).exists()):
+        messages.error(request, 'You are not authorized to post announcements for this course.')
+        return redirect('courses:course_detail', pk=course.pk)
+
+    if request.method == 'POST':
+        form = AnnouncementForm(request.POST)
+        if form.is_valid():
+            announcement = form.save(commit=False)
+            announcement.course = course
+            announcement.posted_by = request.user
+            announcement.save()
+
+            messages.success(request, 'Announcement posted successfully.')
+            return redirect('courses:course_detail', pk=course.pk)
+    else:
+        form = AnnouncementForm()
+
+    context = {
+        'course': course,
+        'form': form,
+    }
+    return render(request, 'courses/announcement_form.html', context)
