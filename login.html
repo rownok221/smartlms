@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - IUBAT LMS</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #86e20db6 0%, #46c51f9c 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Main Container */
+        .login-container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            background-color: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        /* Left Side - Welcome Section */
+        .welcome-section {
+            flex: 1;
+            background: linear-gradient(135deg, #44bb40a6 0%, #44bb40 100%);
+            padding: 40px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .welcome-section h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .welcome-section p {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            background-color: rgba(255,255,255,0.2);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+
+        /* Right Side - Login Form */
+        .form-section {
+            flex: 1;
+            padding: 40px;
+            background-color: white;
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-header a {
+            color: #44bb40;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .form-header a:hover {
+            text-decoration: underline;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #44bb40;
+            box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
+        }
+
+        /* Forgot Password Link */
+        .forgot-password {
+            text-align: right;
+            margin-top: -15px;
+            margin-bottom: 25px;
+        }
+
+        .forgot-password a {
+            color: #44bb40;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        /* Login Button */
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #44bb40;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .login-btn:hover {
+            background-color: #297926;
+        }
+
+        /* Demo Credentials Box */
+
+        /* Social Login */
+       
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+            }
+            
+            .welcome-section {
+                padding: 30px;
+            }
+        }
+
+        /* Remember Me Checkbox */
+        .remember-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .remember-checkbox {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-checkbox input {
+            width: auto;
+            margin-right: 8px;
+            cursor: pointer;
+            accent-color: #28a745;
+        }
+
+        .remember-checkbox label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Side - Welcome Section (Matches Sign Up Page) -->
+        <div class="welcome-section">
+            <h1>Welcome to IUBAT LMS!</h1>
+            <p>Join thousands of learners and start your journey today. Get access to hundreds of courses and expert instructors.</p>
+            
+            <ul class="feature-list">
+                <li>Access to 100+ courses</li>
+                <li>Learn from the best faculties</li>
+                <li>Get certified on completion</li>
+                <li>Lifetime access to course materials</li>
+                <li>Join community of 5,000+ students</li>
+            </ul>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="form-section">
+            <div class="form-header">
+                <h2>Welcome Back!</h2>
+                <p>Don't have an account? <a href="#">Sign Up</a></p>
+            </div>
+
+            <!-- Login Form -->
+            <form>
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="turjya@gmail.com" value="turjya@gmail.com">
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password">
+                </div>
+
+                <!-- Forgot Password Link -->
+                <div class="forgot-password">
+                    <a href="#">Forgot Password?</a>
+                </div>
+
+                <!-- Remember Me Checkbox -->
+                <div class="remember-group">
+                    <div class="remember-checkbox">
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="login-btn">Login to Account</button>
+
+                <!-- Demo Credentials Box (Helpful for testing) -->
+
+                <!-- Social Login -->
+            </form>
+
+            <!-- Additional Info -->
+            <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #999;">
+                By logging in, you agree to our Terms of Service and Privacy Policy
+            </div>
+        </div>
+    </div>
+</body>
+</html>
