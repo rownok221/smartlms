@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Instructor Dashboard | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h2">Instructor Dashboard</h1>
+    <p class="text-muted">Manage courses, publish announcements, create assignments, and review submissions.</p>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Assigned Courses</div>
+                <div class="display-6">{{ assigned_course_count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Assignments</div>
+                <div class="display-6">{{ assignment_count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Submissions Received</div>
+                <div class="display-6">{{ submission_count }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Recent Course Announcements</h5>
+
+                {% if recent_announcements %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for announcement in recent_announcements %}
+                            <div class="border rounded-4 p-3">
+                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                                    <div>
+                                        <div class="fw-semibold">{{ announcement.title }}</div>
+                                        <div class="small text-muted">
+                                            {{ announcement.course.code }} • {{ announcement.created_at|date:"M d, Y h:i A" }}
+                                        </div>
+                                    </div>
+
+                                    {% if announcement.is_pinned %}
+                                        <span class="badge bg-warning text-dark">Pinned</span>
+                                    {% endif %}
+                                </div>
+
+                                <p class="mb-0 mt-2 text-muted">{{ announcement.message|truncatechars:150 }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No announcements available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Quick Actions</h5>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Open My Courses</a>
+                    <a href="{% url 'courses:course_create' %}" class="btn btn-outline-primary">Create Course</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

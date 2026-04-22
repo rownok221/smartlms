@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Assignment | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                <h1 class="h3 mb-3">Submit Assignment</h1>
+                <p class="text-muted mb-2">
+                    <strong>Course:</strong> {{ course.code }} - {{ course.title }}
+                </p>
+                <p class="text-muted mb-4">
+                    <strong>Assignment:</strong> {{ assignment.title }}
+                </p>
+
+                <div class="alert alert-info">
+                    <strong>Deadline:</strong> {{ assignment.deadline|date:"M d, Y h:i A" }}
+                    {% if assignment.is_past_deadline %}
+                        <br><strong>Note:</strong> The deadline has passed. Your submission will be marked as late.
+                    {% endif %}
+                </div>
+
+                {% if existing_submission %}
+                    <div class="alert alert-secondary">
+                        <strong>Current Submission:</strong>
+                        <a href="{{ existing_submission.file.url }}" target="_blank">Open current file</a>
+                        <br>
+                        <strong>Status:</strong> {{ existing_submission.status }}
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Upload File</label>
+                        {{ form.file }}
+                        {% if form.file.errors %}
+                            <div class="text-danger small mt-1">{{ form.file.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            {% if existing_submission %}Update Submission{% else %}Submit Assignment{% endif %}
+                        </button>
+                        <a href="{% url 'assignments:assignment_detail' assignment.pk %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

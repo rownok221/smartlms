@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}SmartLMS | Home{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-white rounded-4 shadow-sm border">
+    <div class="container-fluid py-4">
+        <h1 class="display-5 fw-bold">SmartLMS</h1>
+        <p class="col-md-8 fs-5 text-muted">
+            A small-scale Learning Management System for reliable assignment submission,
+            deadline control, and transparent grading.
+        </p>
+
+        <div class="mt-4">
+            {% if user.is_authenticated %}
+                <a href="{% url 'accounts:dashboard_redirect' %}" class="btn btn-primary btn-lg me-2">
+                    Go to Dashboard
+                </a>
+                <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary btn-lg">
+                    View Courses
+                </a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg me-2">
+                    Login
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title">Role-Based Access</h5>
+                <p class="card-text text-muted">
+                    Separate access for admin, instructor, and student users with controlled dashboards.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title">Course Management</h5>
+                <p class="card-text text-muted">
+                    Organize course spaces, assign instructors, and manage student enrollments efficiently.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title">Transparent Grading</h5>
+                <p class="card-text text-muted">
+                    Timestamped submissions and role-controlled grading help maintain fairness and accountability.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
