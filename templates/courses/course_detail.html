@@ -18,6 +18,10 @@
                 View Assignments
             </a>
 
+            <a href="{% url 'discussions:thread_list' course.pk %}" class="btn btn-outline-primary">
+             View Discussions
+            </a>
+
             {% if can_manage_course %}
                 <a href="{% url 'courses:announcement_create' course.pk %}" class="btn btn-outline-primary">
                     Post Announcement
@@ -40,6 +44,7 @@
                 <p class="mb-2"><strong>Created By:</strong> {{ course.created_by|default:"N/A" }}</p>
                 <p class="mb-2"><strong>Announcements:</strong> {{ announcements|length }}</p>
                 <p class="mb-0"><strong>Created At:</strong> {{ course.created_at }}</p>
+                <p class="mb-2"><strong>Discussion Threads:</strong> {{ course.discussion_threads.count }}</p>
             </div>
         </div>
     </div>

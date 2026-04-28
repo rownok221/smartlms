@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Discussions | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <span class="badge bg-primary mb-2">{{ course.code }}</span>
+        <h1 class="h2 mb-1">Discussion Forum</h1>
+        <p class="text-muted mb-0">Course-wide academic discussion space for {{ course.title }}.</p>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-secondary">
+            Back to Course
+        </a>
+        <a href="{% url 'discussions:thread_create' course.pk %}" class="btn btn-primary">
+            Start Discussion
+        </a>
+    </div>
+</div>
+
+{% if threads %}
+    <div class="d-flex flex-column gap-3">
+        {% for thread in threads %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <div>
+                            <div class="d-flex gap-2 align-items-center mb-2 flex-wrap">
+                                <span class="badge bg-secondary">{{ thread.get_category_display }}</span>
+                                {% if thread.is_pinned %}
+                                    <span class="badge bg-warning text-dark">Pinned</span>
+                                {% endif %}
+                                {% if thread.is_locked %}
+                                    <span class="badge bg-danger">Locked</span>
+                                {% endif %}
+                            </div>
+
+                            <h5 class="mb-1">{{ thread.title }}</h5>
+                            <div class="small text-muted">
+                                Started by {{ thread.created_by|default:"N/A" }}
+                                • {{ thread.created_at|date:"M d, Y h:i A" }}
+                                • {{ thread.replies.count }} repl{{ thread.replies.count|pluralize:"y,ies" }}
+                            </div>
+                        </div>
+
+                        <a href="{% url 'discussions:thread_detail' thread.pk %}" class="btn btn-outline-primary btn-sm">
+                            Open Thread
+                        </a>
+                    </div>
+
+                    <p class="text-muted mt-3 mb-0">{{ thread.content|truncatechars:220 }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h5 class="mb-2">No discussion threads yet</h5>
+            <p class="text-muted mb-0">Be the first to start a course discussion.</p>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
