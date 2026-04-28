@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'apps.assignments',
     'apps.core',
     'apps.discussions',
+    'apps.consultations',
 ]
 
 MIDDLEWARE = [

@@ -10,7 +10,7 @@ from apps.courses.models import Announcement, Course, CourseInstructor, Enrollme
 
 from .forms import CustomLoginForm
 from .models import User
-
+from apps.consultations.models import ConsultationRequest
 
 def home(request):
     return render(request, 'home.html')
@@ -62,6 +62,10 @@ def admin_dashboard(request):
         'assignment_count': Assignment.objects.count(),
         'submission_count': Submission.objects.count(),
         'recent_announcements': recent_announcements,
+        'consultation_count': ConsultationRequest.objects.count(),
+        'pending_consultation_count': ConsultationRequest.objects.filter(
+        status=ConsultationRequest.Status.PENDING
+).count(),
     }
     return render(request, 'accounts/admin_dashboard.html', context)
 
@@ -81,6 +85,13 @@ def instructor_dashboard(request):
     ).select_related('course', 'posted_by').distinct()[:5]
 
     context = {
+        'consultation_count': ConsultationRequest.objects.filter(
+    course__course_instructors__instructor=request.user
+).distinct().count(),
+'pending_consultation_count': ConsultationRequest.objects.filter(
+    course__course_instructors__instructor=request.user,
+    status=ConsultationRequest.Status.PENDING
+).distinct().count(),
         'page_title': 'Instructor Dashboard',
         'assigned_course_count': assigned_courses.count(),
         'assignment_count': Assignment.objects.filter(
@@ -118,6 +129,13 @@ def student_dashboard(request):
             student=request.user
         ).count(),
         'recent_announcements': recent_announcements,
+        'consultation_count': ConsultationRequest.objects.filter(
+    student=request.user
+).count(),
+'pending_consultation_count': ConsultationRequest.objects.filter(
+    student=request.user,
+    status=ConsultationRequest.Status.PENDING
+).count(),
     }
     return render(request, 'accounts/student_dashboard.html', context)
 
