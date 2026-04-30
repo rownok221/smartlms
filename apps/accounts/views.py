@@ -11,6 +11,8 @@ from apps.courses.models import Announcement, Course, CourseInstructor, Enrollme
 from .forms import CustomLoginForm
 from .models import User
 from apps.consultations.models import ConsultationRequest
+from django.db.models import Q
+from apps.mentorship.models import CourseMentor, MentorshipRequest
 
 def home(request):
     return render(request, 'home.html')
@@ -56,6 +58,11 @@ def admin_dashboard(request):
     recent_announcements = Announcement.objects.select_related('course', 'posted_by')[:5]
 
     context = {
+        'mentor_count': CourseMentor.objects.filter(is_active=True).count(),
+        'mentorship_request_count': MentorshipRequest.objects.count(),
+        'pending_mentorship_count': MentorshipRequest.objects.filter(
+        status=MentorshipRequest.Status.PENDING 
+        ).count(),
         'page_title': 'Admin Dashboard',
         'user_count': User.objects.count(),
         'course_count': Course.objects.count(),
@@ -85,6 +92,17 @@ def instructor_dashboard(request):
     ).select_related('course', 'posted_by').distinct()[:5]
 
     context = {
+        'mentor_count': CourseMentor.objects.filter(
+    course__course_instructors__instructor=request.user,
+    is_active=True
+).distinct().count(),
+'mentorship_request_count': MentorshipRequest.objects.filter(
+    course__course_instructors__instructor=request.user
+).distinct().count(),
+'pending_mentorship_count': MentorshipRequest.objects.filter(
+    course__course_instructors__instructor=request.user,
+    status=MentorshipRequest.Status.PENDING
+).distinct().count(),
         'consultation_count': ConsultationRequest.objects.filter(
     course__course_instructors__instructor=request.user
 ).distinct().count(),
@@ -120,6 +138,17 @@ def student_dashboard(request):
     ).select_related('course', 'posted_by').distinct()[:5]
 
     context = {
+        'mentor_count': CourseMentor.objects.filter(
+    student=request.user,
+    is_active=True
+).count(),
+'mentorship_request_count': MentorshipRequest.objects.filter(
+    Q(requester=request.user) | Q(mentor__student=request.user)
+).distinct().count(),
+'pending_mentorship_count': MentorshipRequest.objects.filter(
+    Q(requester=request.user) | Q(mentor__student=request.user),
+    status=MentorshipRequest.Status.PENDING
+).distinct().count(),
         'page_title': 'Student Dashboard',
         'enrolled_course_count': enrolled_courses.count(),
         'assignment_count': Assignment.objects.filter(

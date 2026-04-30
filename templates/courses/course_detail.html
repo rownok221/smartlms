@@ -35,6 +35,11 @@
             <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary">
                 Back to Courses
             </a>
+
+            <a href="{% url 'mentorship:mentor_list' course.pk %}" class="btn btn-outline-primary">
+                 Peer Mentorship
+            </a>
+
         </div>
     </div>
 </div>
@@ -44,6 +49,8 @@
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <h5 class="card-title">Course Overview</h5>
+                <p class="mb-2"><strong>Peer Mentors:</strong> {{ course.course_mentors.count }}</p>
+                <p class="mb-2"><strong>Mentorship Requests:</strong> {{ course.mentorship_requests.count }}</p>
                 <p class="mb-2"><strong>Consultation Requests:</strong> {{ course.consultation_requests.count }}</p>
                 <p class="mb-2"><strong>Course Code:</strong> {{ course.code }}</p>
                 <p class="mb-2"><strong>Created By:</strong> {{ course.created_by|default:"N/A" }}</p>

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'apps.core',
     'apps.discussions',
     'apps.consultations',
+    'apps.mentorship',
 ]
 
 MIDDLEWARE = [

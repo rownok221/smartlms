@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Respond to Mentorship Request | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                <h1 class="h3 mb-3">Respond to Mentorship Request</h1>
+
+                <div class="alert alert-light border">
+                    <p class="mb-1"><strong>Course:</strong> {{ course.code }} - {{ course.title }}</p>
+                    <p class="mb-1"><strong>Requested By:</strong> {{ mentorship_request.requester.full_name|default:mentorship_request.requester.username }}</p>
+                    <p class="mb-1"><strong>Mentor:</strong> {{ mentorship_request.mentor.student.full_name|default:mentorship_request.mentor.student.username }}</p>
+                    <p class="mb-1"><strong>Topic:</strong> {{ mentorship_request.topic }}</p>
+                    <p class="mb-0"><strong>Preferred Time:</strong> {{ mentorship_request.preferred_datetime|date:"M d, Y h:i A" }}</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Decision</label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="text-danger small mt-1">{{ form.status.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Scheduled Date & Time</label>
+                        {{ form.scheduled_datetime }}
+                        {% if form.scheduled_datetime.errors %}
+                            <div class="text-danger small mt-1">{{ form.scheduled_datetime.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">
+                            Required for Accepted or Rescheduled requests.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Mentor Note</label>
+                        {{ form.mentor_note }}
+                        {% if form.mentor_note.errors %}
+                            <div class="text-danger small mt-1">{{ form.mentor_note.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Save Response</button>
+                        <a href="{% url 'mentorship:mentor_list' course.pk %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

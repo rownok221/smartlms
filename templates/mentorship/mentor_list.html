@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Peer Mentorship | SmartLMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <span class="badge bg-primary mb-2">{{ course.code }}</span>
+        <h1 class="h2 mb-1">Peer Mentorship</h1>
+        <p class="text-muted mb-0">
+            Course-wise peer support from instructor-approved student mentors.
+        </p>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-secondary">
+            Back to Course
+        </a>
+
+        {% if can_manage_mentorship %}
+            <a href="{% url 'mentorship:mentor_create' course.pk %}" class="btn btn-primary">
+                Assign Peer Mentor
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Available Peer Mentors</h5>
+
+                {% if mentors %}
+                    <div class="row g-4">
+                        {% for mentor in mentors %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="border rounded-4 p-3 h-100 bg-light-subtle">
+                                    <h6 class="mb-1">
+                                        {{ mentor.student.full_name|default:mentor.student.username }}
+                                    </h6>
+
+                                    <div class="small text-muted mb-2">
+                                        Expertise: {{ mentor.expertise }}
+                                    </div>
+
+                                    <p class="text-muted mb-3">
+                                        {{ mentor.bio|default:"No mentor bio added yet."|truncatechars:120 }}
+                                    </p>
+
+                                    {% if can_request_mentorship and mentor.student != user %}
+                                        <a href="{% url 'mentorship:mentorship_request_create' mentor.pk %}"
+                                           class="btn btn-outline-primary btn-sm">
+                                            Request Mentoring
+                                        </a>
+                                    {% elif mentor.student == user %}
+                                        <span class="badge bg-success">You are a mentor</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">
+                        No peer mentors have been assigned for this course yet.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-3">
+            {% if can_manage_mentorship %}
+                Mentorship Requests
+            {% elif is_current_user_mentor %}
+                My Mentoring Activity
+            {% else %}
+                My Mentorship Requests
+            {% endif %}
+        </h5>
+
+        {% if mentorship_requests %}
+            <div class="d-flex flex-column gap-3">
+                {% for item in mentorship_requests %}
+                    <div class="border rounded-4 p-3">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                            <div>
+                                <div class="d-flex gap-2 flex-wrap mb-2">
+                                    {% if item.status == 'PENDING' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif item.status == 'ACCEPTED' %}
+                                        <span class="badge bg-success">Accepted</span>
+                                    {% elif item.status == 'RESCHEDULED' %}
+                                        <span class="badge bg-info text-dark">Rescheduled</span>
+                                    {% elif item.status == 'REJECTED' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% elif item.status == 'COMPLETED' %}
+                                        <span class="badge bg-secondary">Completed</span>
+                                    {% endif %}
+                                </div>
+
+                                <h6 class="mb-1">{{ item.topic }}</h6>
+
+                                <div class="small text-muted mb-2">
+                                    Requested by {{ item.requester.full_name|default:item.requester.username }}
+                                    → Mentor {{ item.mentor.student.full_name|default:item.mentor.student.username }}
+                                    • {{ item.created_at|date:"M d, Y h:i A" }}
+                                </div>
+
+                                <p class="text-muted mb-2">{{ item.description|linebreaksbr }}</p>
+
+                                <div class="small">
+                                    <div><strong>Preferred Time:</strong> {{ item.preferred_datetime|date:"M d, Y h:i A" }}</div>
+
+                                    {% if item.scheduled_datetime %}
+                                        <div><strong>Scheduled Time:</strong> {{ item.scheduled_datetime|date:"M d, Y h:i A" }}</div>
+                                    {% endif %}
+
+                                    {% if item.handled_by %}
+                                        <div><strong>Handled By:</strong> {{ item.handled_by.full_name|default:item.handled_by.username }}</div>
+                                    {% endif %}
+                                </div>
+
+                                {% if item.mentor_note %}
+                                    <div class="alert alert-light border mt-3 mb-0">
+                                        <strong>Mentor Note:</strong><br>
+                                        {{ item.mentor_note|linebreaksbr }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if can_manage_mentorship or item.mentor.student == user %}
+                                <div>
+                                    <a href="{% url 'mentorship:mentorship_respond' item.pk %}"
+                                       class="btn btn-outline-primary btn-sm">
+                                        Respond / Update
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted mb-0">
+                No mentorship requests available yet.
+            </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
