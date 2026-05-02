@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from apps.accounts.models import User
 
 from .forms import AnnouncementForm, CourseForm
-from .models import Announcement, Course, CourseInstructor, Enrollment
+from .models import Announcement, AnnouncementAttachment, Course, CourseInstructor, Enrollment
 
 
 def is_admin(user):
@@ -79,7 +79,9 @@ def course_detail(request, pk):
 
     instructors = CourseInstructor.objects.filter(course=course).select_related('instructor')
     students = Enrollment.objects.filter(course=course).select_related('student')
-    announcements = Announcement.objects.filter(course=course).select_related('posted_by')
+    announcements = Announcement.objects.filter(course=course).select_related(
+    'posted_by'
+).prefetch_related('attachments')
 
     context = {
         'course': course,
@@ -131,20 +133,26 @@ def announcement_create(request, course_pk):
         return redirect('courses:course_detail', pk=course.pk)
 
     if request.method == 'POST':
-        form = AnnouncementForm(request.POST)
+        form = AnnouncementForm(request.POST, request.FILES)
         if form.is_valid():
             announcement = form.save(commit=False)
             announcement.course = course
             announcement.posted_by = request.user
             announcement.save()
 
+            for file in form.cleaned_data.get('attachments', []):
+                AnnouncementAttachment.objects.create(
+                    announcement=announcement,
+                    file=file,
+                    uploaded_by=request.user
+                )
+
             messages.success(request, 'Announcement posted successfully.')
             return redirect('courses:course_detail', pk=course.pk)
     else:
         form = AnnouncementForm()
-
-    context = {
-        'course': course,
-        'form': form,
-    }
-    return render(request, 'courses/announcement_form.html', context)
+        context = {
+            'course': course,
+            'form': form,
+        }
+        return render(request, 'courses/announcement_form.html', context)

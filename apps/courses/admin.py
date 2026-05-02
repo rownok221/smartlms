@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from .models import Announcement, Course, CourseInstructor, Enrollment
+from .models import Announcement, AnnouncementAttachment, Course, CourseInstructor, Enrollment
+
+
+class AnnouncementAttachmentInline(admin.TabularInline):
+    model = AnnouncementAttachment
+    extra = 1
+    readonly_fields = ('uploaded_at',)
 
 
 class CourseInstructorInline(admin.TabularInline):
@@ -47,3 +53,11 @@ class AnnouncementAdmin(admin.ModelAdmin):
     list_display = ('title', 'course', 'is_pinned', 'posted_by', 'created_at')
     search_fields = ('title', 'course__code', 'course__title', 'posted_by__username')
     list_filter = ('is_pinned', 'created_at')
+    inlines = [AnnouncementAttachmentInline]
+
+
+@admin.register(AnnouncementAttachment)
+class AnnouncementAttachmentAdmin(admin.ModelAdmin):
+    list_display = ('announcement', 'file', 'uploaded_by', 'uploaded_at')
+    search_fields = ('announcement__title', 'announcement__course__code', 'uploaded_by__username')
+    list_filter = ('uploaded_at',)

@@ -7,7 +7,7 @@ from apps.accounts.models import User
 from apps.courses.models import Course, CourseInstructor, Enrollment
 
 from .forms import AssignmentForm, GradeForm, SubmissionForm
-from .models import Assignment, Grade, Submission
+from .models import Assignment, AssignmentAttachment, Grade, Submission
 
 
 def is_admin(user):
@@ -48,7 +48,9 @@ def assignment_list(request, course_pk):
         messages.error(request, 'You are not authorized to view assignments for this course.')
         return redirect('courses:course_list')
 
-    assignments = Assignment.objects.filter(course=course).select_related('created_by')
+    assignments = Assignment.objects.filter(course=course).select_related(
+    'created_by'
+).prefetch_related('attachments')
 
     student_submissions = {}
     if is_student(request.user):
@@ -70,9 +72,12 @@ def assignment_list(request, course_pk):
 @login_required
 def assignment_detail(request, pk):
     assignment = get_object_or_404(
-        Assignment.objects.select_related('course', 'created_by'),
-        pk=pk
-    )
+    Assignment.objects.select_related(
+        'course',
+        'created_by'
+    ).prefetch_related('attachments'),
+    pk=pk
+)
     course = assignment.course
 
     if not can_access_course(request.user, course):
@@ -112,12 +117,19 @@ def assignment_create(request, course_pk):
         return redirect('assignments:assignment_list', course_pk=course.pk)
 
     if request.method == 'POST':
-        form = AssignmentForm(request.POST)
+        form = AssignmentForm(request.POST, request.FILES)
         if form.is_valid():
             assignment = form.save(commit=False)
             assignment.course = course
             assignment.created_by = request.user
             assignment.save()
+
+            for file in form.cleaned_data.get('attachments', []):
+                AssignmentAttachment.objects.create(
+                    assignment=assignment,
+                    file=file,
+                    uploaded_by=request.user
+                )
 
             messages.success(request, 'Assignment created successfully.')
             return redirect('assignments:assignment_detail', pk=assignment.pk)

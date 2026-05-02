@@ -1,5 +1,5 @@
 from django import forms
-
+from apps.core.form_fields import MultipleFileField
 from .models import Assignment, Grade, Submission
 
 
@@ -12,9 +12,14 @@ class AssignmentForm(forms.ModelForm):
         })
     )
 
+    attachments = MultipleFileField(
+    required=False,
+    help_text="Optional: attach question PDF, instructions, slides, or reference files."
+)
+        
     class Meta:
         model = Assignment
-        fields = ['title', 'description', 'deadline', 'max_marks']
+        fields = ['title', 'description', 'deadline', 'max_marks', 'attachments']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',

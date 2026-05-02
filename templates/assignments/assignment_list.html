@@ -39,7 +39,7 @@
                         <div class="small text-muted mb-3">
                             <div><strong>Deadline:</strong> {{ assignment.deadline|date:"M d, Y h:i A" }}</div>
                             <div><strong>Max Marks:</strong> {{ assignment.max_marks }}</div>
-
+                            <div><strong>Attachments:</strong> {{ assignment.attachments.count }}</div>
                             {% if can_create_assignment %}
                                 <div><strong>Submissions:</strong> {{ assignment.submissions.count }}</div>
                             {% endif %}

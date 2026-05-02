@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from .models import Assignment, Grade, Submission
+from .models import Assignment, AssignmentAttachment, Grade, Submission
+
+
+class AssignmentAttachmentInline(admin.TabularInline):
+    model = AssignmentAttachment
+    extra = 1
+    readonly_fields = ('uploaded_at',)
 
 
 @admin.register(Assignment)
@@ -9,6 +15,14 @@ class AssignmentAdmin(admin.ModelAdmin):
     search_fields = ('title', 'course__code', 'course__title')
     list_filter = ('deadline', 'created_at')
     ordering = ('deadline',)
+    inlines = [AssignmentAttachmentInline]
+
+
+@admin.register(AssignmentAttachment)
+class AssignmentAttachmentAdmin(admin.ModelAdmin):
+    list_display = ('assignment', 'file', 'uploaded_by', 'uploaded_at')
+    search_fields = ('assignment__title', 'assignment__course__code', 'uploaded_by__username')
+    list_filter = ('uploaded_at',)
 
 
 @admin.register(Submission)

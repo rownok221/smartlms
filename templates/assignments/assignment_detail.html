@@ -31,6 +31,22 @@
                 <p class="mb-2"><strong>Course:</strong> {{ assignment.course }}</p>
                 <p class="mb-2"><strong>Deadline:</strong> {{ assignment.deadline|date:"M d, Y h:i A" }}</p>
                 <p class="mb-2"><strong>Max Marks:</strong> {{ assignment.max_marks }}</p>
+                <hr>
+<h6 class="mb-2">Assignment Resources</h6>
+
+{% if assignment.attachments.all %}
+    <ul class="mb-0">
+        {% for attachment in assignment.attachments.all %}
+            <li>
+                <a href="{{ attachment.file.url }}" target="_blank">
+                    {{ attachment.file.name|cut:"assignment_attachments/" }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="text-muted mb-0">No files attached to this assignment.</p>
+{% endif %}
                 <p class="mb-0"><strong>Created By:</strong> {{ assignment.created_by|default:"N/A" }}</p>
             </div>
         </div>

@@ -1,6 +1,7 @@
 from django import forms
 
 from .models import Announcement, Course
+from apps.core.form_fields import MultipleFileField
 
 
 class CourseForm(forms.ModelForm):
@@ -25,9 +26,13 @@ class CourseForm(forms.ModelForm):
 
 
 class AnnouncementForm(forms.ModelForm):
+    attachments = MultipleFileField(
+    required=False,
+    help_text="Optional: attach lecture slides, study materials, practice questions, or PDFs."
+)
     class Meta:
         model = Announcement
-        fields = ['title', 'message', 'is_pinned']
+        fields = ['title', 'message', 'is_pinned', 'attachments']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',

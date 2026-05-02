@@ -11,7 +11,11 @@ def submission_upload_path(instance, filename):
         f"assignment_{instance.assignment.id}/"
         f"student_{instance.student.id}/{filename}"
     )
-
+def assignment_attachment_upload_path(instance, filename):
+    return (
+        f"assignment_attachments/course_{instance.assignment.course.id}/"
+        f"assignment_{instance.assignment.id}/{filename}"
+    )
 
 class Assignment(models.Model):
     course = models.ForeignKey(
@@ -43,6 +47,27 @@ class Assignment(models.Model):
     def is_past_deadline(self):
         return timezone.now() > self.deadline
 
+class AssignmentAttachment(models.Model):
+    assignment = models.ForeignKey(
+        Assignment,
+        on_delete=models.CASCADE,
+        related_name='attachments'
+    )
+    file = models.FileField(upload_to=assignment_attachment_upload_path)
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='uploaded_assignment_attachments'
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['uploaded_at']
+
+    def __str__(self):
+        return f"Attachment for {self.assignment.title}"
 
 class Submission(models.Model):
     class Status(models.TextChoices):

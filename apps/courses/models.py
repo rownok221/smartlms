@@ -2,6 +2,13 @@ from django.conf import settings
 from django.db import models
 
 
+def announcement_attachment_upload_path(instance, filename):
+    return (
+        f"announcement_attachments/course_{instance.announcement.course.id}/"
+        f"announcement_{instance.announcement.id}/{filename}"
+    )
+
+
 class Course(models.Model):
     title = models.CharField(max_length=150)
     code = models.CharField(max_length=20, unique=True)
@@ -89,3 +96,26 @@ class Announcement(models.Model):
 
     def __str__(self):
         return f"{self.course.code} - {self.title}"
+
+
+class AnnouncementAttachment(models.Model):
+    announcement = models.ForeignKey(
+        Announcement,
+        on_delete=models.CASCADE,
+        related_name='attachments'
+    )
+    file = models.FileField(upload_to=announcement_attachment_upload_path)
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='uploaded_announcement_attachments'
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['uploaded_at']
+
+    def __str__(self):
+        return f"Attachment for {self.announcement.title}"
