@@ -4,9 +4,9 @@ from django.contrib.auth.admin import UserAdmin
 from .models import User
 
 
-admin.site.site_header = "SmartLMS Admin"
-admin.site.site_title = "SmartLMS Admin Portal"
-admin.site.index_title = "SmartLMS Administration"
+admin.site.site_header = "ClassADDA Admin"
+admin.site.site_title = "ClassADDA Admin Portal"
+admin.site.index_title = "ClassADDA Administration"
 
 
 @admin.register(User)

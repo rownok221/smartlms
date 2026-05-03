@@ -1,65 +1,177 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}SmartLMS | Home{% endblock %}
+{% block title %}ClassADDA | Learn. Discuss. Connect.{% endblock %}
 
 {% block content %}
-<div class="p-5 mb-4 bg-white rounded-4 shadow-sm border">
-    <div class="container-fluid py-4">
-        <h1 class="display-5 fw-bold">SmartLMS</h1>
-        <p class="col-md-8 fs-5 text-muted">
-            A small-scale Learning Management System for reliable assignment submission,
-            deadline control, and transparent grading.
-        </p>
+<section class="ca-home-hero">
+    <div class="container ca-shell">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="ca-hero-kicker mb-4">
+                    <img src="{% static 'img/iubat-logo.png' %}" alt="IUBAT Logo" class="ca-kicker-logo">
+                    <span>Platform for IUBAT-style academic workflows</span>
+                </div>
 
-        <div class="mt-4">
-            {% if user.is_authenticated %}
-                <a href="{% url 'accounts:dashboard_redirect' %}" class="btn btn-primary btn-lg me-2">
-                    Go to Dashboard
-                </a>
-                <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary btn-lg">
-                    View Courses
-                </a>
-            {% else %}
-                <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg me-2">
-                    Login
-                </a>
-            {% endif %}
-        </div>
-    </div>
-</div>
+                <h1 class="ca-hero-title">ClassADDA</h1>
+                <h2 class="ca-hero-subtitle">Learn. Discuss. Connect.</h2>
 
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <h5 class="card-title">Role-Based Access</h5>
-                <p class="card-text text-muted">
-                    Separate access for admin, instructor, and student users with controlled dashboards.
+                <p class="ca-hero-text">
+                    A complete university-focused LMS for course spaces, assignments, announcements,
+                    file sharing, moderated discussions, consultation hours, and controlled peer mentoring.
                 </p>
+
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'accounts:dashboard_redirect' %}" class="btn btn-ca-gold btn-lg">
+                            Go to Dashboard
+                        </a>
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-outline-ca-light btn-lg">
+                            Explore Courses
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-ca-gold btn-lg">
+                            Login to ClassADDA
+                        </a>
+                        <a href="#features" class="btn btn-outline-ca-light btn-lg">
+                            Explore Features
+                        </a>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap mt-4">
+                    <span class="badge bg-primary">Student</span>
+                    <span class="badge bg-success">Instructor</span>
+                    <span class="badge bg-warning text-dark">Admin</span>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="ca-hero-panel">
+                    <div class="ca-hero-panel-head">
+                        <div>
+                            <div class="ca-panel-title">ClassADDA Dashboard</div>
+                            <div class="ca-panel-subtitle">Live academic overview</div>
+                        </div>
+                        <span class="badge bg-warning text-dark">IUBAT</span>
+                    </div>
+
+                    <div class="ca-panel-body">
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <div class="ca-stat-card stat-green">
+                                    <div class="small text-muted">Courses</div>
+                                    <div class="ca-stat-number">4</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="ca-stat-card stat-gold">
+                                    <div class="small text-muted">Assignments</div>
+                                    <div class="ca-stat-number">12</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ca-mini-card mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>Upcoming Deadline</strong>
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            </div>
+                            <div class="text-muted small">Software Engineering Report Submission</div>
+                        </div>
+
+                        <div class="ca-mini-card mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>Course Announcement</strong>
+                                <span class="badge bg-primary">Pinned</span>
+                            </div>
+                            <div class="text-muted small">Study materials and lecture slides uploaded.</div>
+                        </div>
+
+                        <div class="ca-mini-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>Consultation Session</strong>
+                                <span class="badge bg-success">Accepted</span>
+                            </div>
+                            <div class="text-muted small">Meeting confirmed with course instructor.</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</section>
 
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <h5 class="card-title">Course Management</h5>
-                <p class="card-text text-muted">
-                    Organize course spaces, assign instructors, and manage student enrollments efficiently.
-                </p>
+<section id="features" class="ca-features-section">
+    <div class="container ca-shell">
+        <div class="text-center mb-5">
+            <h2 class="ca-section-title">Academic Features</h2>
+            <p class="ca-section-subtitle">
+                A complete system for teaching, learning, communication, and academic support.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-xl-4">
+                <div class="card ca-feature-card ca-accent-green h-100">
+                    <div class="card-body">
+                        <div class="ca-feature-icon green">C</div>
+                        <h5>Course Management</h5>
+                        <p class="text-muted mb-0">Organized course spaces for instructors and students with structured academic access.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+                <div class="card ca-feature-card ca-accent-gold h-100">
+                    <div class="card-body">
+                        <div class="ca-feature-icon gold">A</div>
+                        <h5>Assignment Workflow</h5>
+                        <p class="text-muted mb-0">Create assignments, attach files, submit work, and maintain transparent grading.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+                <div class="card ca-feature-card ca-accent-red h-100">
+                    <div class="card-body">
+                        <div class="ca-feature-icon red">N</div>
+                        <h5>Announcements & Materials</h5>
+                        <p class="text-muted mb-0">Share lecture slides, PDFs, notes, and pinned course notices in one place.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+                <div class="card ca-feature-card ca-accent-green h-100">
+                    <div class="card-body">
+                        <div class="ca-feature-icon green">D</div>
+                        <h5>Discussions</h5>
+                        <p class="text-muted mb-0">Course-wise moderated discussion threads for academic questions and collaboration.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+                <div class="card ca-feature-card ca-accent-gold h-100">
+                    <div class="card-body">
+                        <div class="ca-feature-icon gold">S</div>
+                        <h5>Consultation Scheduling</h5>
+                        <p class="text-muted mb-0">Students can request additional academic support without scheduling confusion.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+                <div class="card ca-feature-card ca-accent-red h-100">
+                    <div class="card-body">
+                        <div class="ca-feature-icon red">M</div>
+                        <h5>Peer Mentorship</h5>
+                        <p class="text-muted mb-0">Instructor-controlled peer mentoring for students who prefer collaborative support.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <h5 class="card-title">Transparent Grading</h5>
-                <p class="card-text text-muted">
-                    Timestamped submissions and role-controlled grading help maintain fairness and accountability.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
+</section>
 {% endblock %}

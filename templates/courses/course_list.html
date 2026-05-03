@@ -1,57 +1,80 @@
 {% extends 'base.html' %}
 
-{% block title %}Courses | SmartLMS{% endblock %}
+{% block title %}Courses | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h2 mb-1">Courses</h1>
-        <p class="text-muted mb-0">Browse and manage course spaces in SmartLMS.</p>
+<div class="container ca-page-wrap">
+    <div class="ca-section-header d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div>
+            <h1 class="h2">Courses</h1>
+            <p>Browse course spaces and move seamlessly into assignments, discussions, consultations, and mentorship.</p>
+        </div>
+
+        {% if can_create_course %}
+            <a href="{% url 'courses:course_create' %}" class="btn btn-ca-primary">
+                Create Course
+            </a>
+        {% endif %}
     </div>
 
-    {% if can_create_course %}
-        <a href="{% url 'courses:course_create' %}" class="btn btn-primary">
-            Create Course
-        </a>
-    {% endif %}
-</div>
+    {% if courses %}
+        <div class="row g-4">
+            {% for course in courses %}
+                <div class="col-md-6 col-xl-4">
+                    <div class="card h-100 ca-card-hover ca-card-accent-green">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                <span class="badge bg-primary">{{ course.code }}</span>
+                                <span class="small text-muted">
+                                    {{ course.announcements.count }} announcement{{ course.announcements.count|pluralize }}
+                                </span>
+                            </div>
 
-{% if courses %}
-    <div class="row g-4">
-        {% for course in courses %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="badge bg-primary">{{ course.code }}</span>
+                            <h5 class="card-title mb-2">{{ course.title }}</h5>
+
+                            <p class="text-muted mb-3">
+                                {{ course.description|default:"No description added yet."|truncatechars:130 }}
+                            </p>
+
+                            <div class="row g-2 mb-4">
+                                <div class="col-6">
+                                    <div class="p-3 rounded-3 border bg-white">
+                                        <div class="small text-muted">Instructors</div>
+                                        <strong>{{ course.course_instructors.count }}</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-3 rounded-3 border bg-white">
+                                        <div class="small text-muted">Students</div>
+                                        <strong>{{ course.enrollments.count }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mb-3">
+                                <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-ca-primary">
+                                    Open Course Hub
+                                </a>
+                            </div>
+
+                            <div class="ca-action-grid">
+                                <a href="{% url 'assignments:assignment_list' course.pk %}" class="ca-action-chip">Assignments</a>
+                                <a href="{% url 'discussions:thread_list' course.pk %}" class="ca-action-chip">Discussions</a>
+                                <a href="{% url 'consultations:consultation_list' course.pk %}" class="ca-action-chip">Consult</a>
+                                <a href="{% url 'mentorship:mentor_list' course.pk %}" class="ca-action-chip">Mentors</a>
+                            </div>
                         </div>
-
-                        <h5 class="card-title">{{ course.title }}</h5>
-                        <p class="card-text text-muted">
-                            {{ course.description|default:"No description added yet."|truncatechars:120 }}
-                        </p>
-
-                        <div class="small text-muted mb-3">
-                            <div><strong>Instructors:</strong> {{ course.course_instructors.count }}</div>
-                            <div><strong>Students:</strong> {{ course.enrollments.count }}</div>
-                        </div>
-
-                        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-primary btn-sm">
-                            View Course
-                        </a>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <h5 class="mb-2">No courses available</h5>
-            <p class="text-muted mb-0">
-                There are no visible courses for your account yet.
-            </p>
+            {% endfor %}
         </div>
-    </div>
-{% endif %}
+    {% else %}
+        <div class="card ca-card-accent-gold">
+            <div class="card-body p-4">
+                <h5 class="mb-2">No courses available</h5>
+                <p class="text-muted mb-0">There are no visible courses for your account yet.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
