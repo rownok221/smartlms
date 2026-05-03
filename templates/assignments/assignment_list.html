@@ -1,86 +1,80 @@
 {% extends 'base.html' %}
-{% load assignment_extras %}
 
 {% block title %}Assignments | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
-    <div>
-        <span class="badge bg-primary mb-2">{{ course.code }}</span>
-        <h1 class="h2 mb-1">Assignments</h1>
-        <p class="text-muted mb-0">Manage and review assignments for {{ course.title }}.</p>
-    </div>
+<div class="container ca-shell ca-workflow-wrap">
+    <section class="ca-page-hero">
+        <div>
+            <span class="ca-course-code">{{ course.code }}</span>
+            <h1>Assignments</h1>
+            <p>Manage, review, and submit coursework for {{ course.title }}.</p>
+        </div>
 
-    <div class="d-flex gap-2">
-        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-secondary">
-            Back to Course
-        </a>
-
-        {% if can_create_assignment %}
-            <a href="{% url 'assignments:assignment_create' course.pk %}" class="btn btn-primary">
-                Create Assignment
+        <div class="ca-page-hero-actions">
+            <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-ca-light">
+                Back to Course
             </a>
-        {% endif %}
-    </div>
-</div>
 
-{% if assignments %}
-    <div class="row g-4">
-        {% for assignment in assignments %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ assignment.title }}</h5>
+            {% if can_create_assignment or can_manage_assignment or can_manage_course %}
+                <a href="{% url 'assignments:assignment_create' course.pk %}" class="btn btn-ca-gold">
+                    Create Assignment
+                </a>
+            {% endif %}
+        </div>
+    </section>
 
-                        <p class="card-text text-muted">
-                            {{ assignment.description|default:"No description added yet."|truncatechars:120 }}
-                        </p>
+    {% if assignments %}
+        <div class="row g-4">
+            {% for assignment in assignments %}
+                <div class="col-md-6 col-xl-4">
+                    <div class="card ca-work-card h-100 ca-card-hover">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-primary">{{ course.code }}</span>
+                                <span class="ca-status gold">{{ assignment.max_marks }} Marks</span>
+                            </div>
 
-                        <div class="small text-muted mb-3">
-                            <div><strong>Deadline:</strong> {{ assignment.deadline|date:"M d, Y h:i A" }}</div>
-                            <div><strong>Max Marks:</strong> {{ assignment.max_marks }}</div>
-                            <div><strong>Attachments:</strong> {{ assignment.attachments.count }}</div>
-                            {% if can_create_assignment %}
-                                <div><strong>Submissions:</strong> {{ assignment.submissions.count }}</div>
-                            {% endif %}
-                        </div>
+                            <h5 class="mb-2">{{ assignment.title }}</h5>
 
-                        {% if student_submissions and assignment.id in student_submissions %}
-                            {% with my_submission=student_submissions|get_item:assignment.id %}
-                                <div class="mb-3">
-                                    {% if my_submission.status == 'LATE' %}
-                                        <span class="badge bg-danger">Late</span>
-                                    {% else %}
-                                        <span class="badge bg-success">Submitted</span>
-                                    {% endif %}
+                            <p class="text-muted mb-3">
+                                {{ assignment.description|default:"No description added."|truncatechars:135 }}
+                            </p>
+
+                            <div class="ca-info-mini mb-3">
+                                <div>
+                                    <span>Deadline</span>
+                                    <strong>{{ assignment.deadline|date:"M d, Y h:i A" }}</strong>
                                 </div>
-                            {% endwith %}
-                        {% elif not can_create_assignment %}
-                            <div class="mb-3">
-                                {% if assignment.is_past_deadline %}
-                                    <span class="badge bg-danger">Deadline Passed</span>
-                                {% else %}
-                                    <span class="badge bg-warning text-dark">Not Submitted</span>
+
+                                <div>
+                                    <span>Attachments</span>
+                                    <strong>{{ assignment.attachments.count }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'assignments:assignment_detail' assignment.pk %}" class="btn btn-ca-primary">
+                                    View Assignment
+                                </a>
+
+                                {% if can_create_assignment or can_manage_assignment or can_manage_course %}
+                                    <a href="{% url 'assignments:assignment_update' assignment.pk %}" class="btn btn-outline-primary">
+                                        Edit Assignment
+                                    </a>
                                 {% endif %}
                             </div>
-                        {% endif %}
-
-                        <a href="{% url 'assignments:assignment_detail' assignment.pk %}" class="btn btn-outline-primary btn-sm">
-                            View Assignment
-                        </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <h5 class="mb-2">No assignments yet</h5>
-            <p class="text-muted mb-0">
-                There are no assignments available for this course right now.
-            </p>
+            {% endfor %}
         </div>
-    </div>
-{% endif %}
+    {% else %}
+        <div class="ca-panel">
+            <div class="ca-empty-state">
+                No assignments have been created for this course yet.
+            </div>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

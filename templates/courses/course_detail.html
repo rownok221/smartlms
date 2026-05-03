@@ -1,195 +1,249 @@
 {% extends 'base.html' %}
 {% load file_extras %}
+
 {% block title %}{{ course.code }} | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="mb-4">
-    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+<div class="container ca-shell ca-workflow-wrap">
+    <section class="ca-course-hero">
         <div>
-            <span class="badge bg-primary mb-2">{{ course.code }}</span>
-            <h1 class="h2 mb-2">{{ course.title }}</h1>
-            <p class="text-muted mb-0">
-                {{ course.description|default:"No course description available yet." }}
-            </p>
+            <span class="ca-course-code">{{ course.code }}</span>
+            <h1>{{ course.title }}</h1>
+            <p>{{ course.description|default:"No course description has been added yet." }}</p>
+
+            <div class="ca-course-meta">
+                <span>{{ course.course_instructors.count }} instructor{{ course.course_instructors.count|pluralize }}</span>
+                <span>{{ course.enrollments.count }} student{{ course.enrollments.count|pluralize }}</span>
+                <span>{{ course.assignments.count }} assignment{{ course.assignments.count|pluralize }}</span>
+                <span>{{ course.announcements.count }} announcement{{ course.announcements.count|pluralize }}</span>
+            </div>
         </div>
 
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="{% url 'assignments:assignment_list' course.pk %}" class="btn btn-primary">
-                View Assignments
-            </a>
-
-            <a href="{% url 'discussions:thread_list' course.pk %}" class="btn btn-outline-primary">
-             View Discussions
-            </a>
-
-            <a href="{% url 'consultations:consultation_list' course.pk %}" class="btn btn-outline-primary">
-            Consultation Hours
-            </a>
+        <div class="ca-course-hero-actions">
+            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-ca-light">Back to Courses</a>
 
             {% if can_manage_course %}
-                <a href="{% url 'courses:announcement_create' course.pk %}" class="btn btn-outline-primary">
+                <a href="{% url 'courses:announcement_create' course.pk %}" class="btn btn-ca-gold">
                     Post Announcement
                 </a>
             {% endif %}
-
-            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary">
-                Back to Courses
-            </a>
-
-            <a href="{% url 'mentorship:mentor_list' course.pk %}" class="btn btn-outline-primary">
-                 Peer Mentorship
-            </a>
-
         </div>
-    </div>
-</div>
+    </section>
 
-<div class="row g-4">
-    <div class="col-lg-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <h5 class="card-title">Course Overview</h5>
-                <p class="mb-2"><strong>Peer Mentors:</strong> {{ course.course_mentors.count }}</p>
-                <p class="mb-2"><strong>Mentorship Requests:</strong> {{ course.mentorship_requests.count }}</p>
-                <p class="mb-2"><strong>Consultation Requests:</strong> {{ course.consultation_requests.count }}</p>
-                <p class="mb-2"><strong>Course Code:</strong> {{ course.code }}</p>
-                <p class="mb-2"><strong>Created By:</strong> {{ course.created_by|default:"N/A" }}</p>
-                <p class="mb-2"><strong>Announcements:</strong> {{ announcements|length }}</p>
-                <p class="mb-0"><strong>Created At:</strong> {{ course.created_at }}</p>
-                <p class="mb-2"><strong>Discussion Threads:</strong> {{ course.discussion_threads.count }}</p>
-            </div>
-        </div>
-    </div>
+    <section class="ca-module-grid mb-4">
+        <a href="{% url 'assignments:assignment_list' course.pk %}" class="ca-module-card green">
+            <span>A</span>
+            <strong>Assignments</strong>
+            <small>Create, submit, review, and grade coursework.</small>
+        </a>
 
-    <div class="col-lg-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <h5 class="card-title">Instructors</h5>
-                {% if instructors %}
-                    <ul class="mb-0">
-                        {% for item in instructors %}
-                            <li>{{ item.instructor.full_name|default:item.instructor.username }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p class="text-muted mb-0">No instructor assigned yet.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+        <a href="{% url 'discussions:thread_list' course.pk %}" class="ca-module-card gold">
+            <span>D</span>
+            <strong>Discussions</strong>
+            <small>Course-wise academic discussion threads.</small>
+        </a>
 
-    <div class="col-lg-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <h5 class="card-title">Enrolled Students</h5>
-                <p class="display-6 mb-0">{{ students|length }}</p>
-            </div>
-        </div>
-    </div>
-</div>
+        <a href="{% url 'consultations:consultation_list' course.pk %}" class="ca-module-card red">
+            <span>C</span>
+            <strong>Consultation Hours</strong>
+            <small>Request and schedule instructor support.</small>
+        </a>
 
-<div class="row g-4 mt-1">
-    <div class="col-lg-7">
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Course Announcements</h5>
+        <a href="{% url 'mentorship:mentor_list' course.pk %}" class="ca-module-card green">
+            <span>M</span>
+            <strong>Peer Mentorship</strong>
+            <small>Instructor-approved peer learning support.</small>
+        </a>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="ca-panel mb-4">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>Course Announcements</h5>
+                        <p>Important updates, study materials, and course notices.</p>
+                    </div>
+
+                    {% if can_manage_course %}
+                        <a href="{% url 'courses:announcement_create' course.pk %}" class="btn btn-sm btn-outline-primary">
+                            Post Announcement
+                        </a>
+                    {% endif %}
+                </div>
 
                 {% if announcements %}
-                    <div class="d-flex flex-column gap-3">
+                    <div class="ca-list-stack">
                         {% for announcement in announcements %}
-                            <div class="border rounded-4 p-3 bg-light-subtle">
-                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                            <article class="ca-announcement-card">
+                                <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
                                     <div>
-                                        <h6 class="mb-1">{{ announcement.title }}</h6>
-                                        <div class="small text-muted">
-                                            Posted by {{ announcement.posted_by|default:"N/A" }}
-                                            • {{ announcement.created_at|date:"M d, Y h:i A" }}
+                                        <h5 class="mb-1">{{ announcement.title }}</h5>
+                                        <div class="ca-muted-line">
+                                            Posted by {{ announcement.posted_by.full_name|default:announcement.posted_by.username }}
+                                            {% if announcement.posted_by.role %}({{ announcement.posted_by.role|title }}){% endif %}
+                                            · {{ announcement.created_at|date:"M d, Y h:i A" }}
                                         </div>
                                     </div>
 
-                                    <div>
-                                        {% if announcement.is_pinned %}
-                                            <span class="badge bg-warning text-dark">Pinned</span>
-                                        {% endif %}
-                                    </div>
+                                    {% if announcement.is_pinned %}
+                                        <span class="ca-status gold">Pinned</span>
+                                    {% endif %}
                                 </div>
 
                                 <p class="mb-0">{{ announcement.message|linebreaksbr }}</p>
+
                                 {% if announcement.attachments.all %}
-    <div class="mt-3">
-        <div class="small fw-semibold mb-1">Attached Materials</div>
-        <ul class="mb-0">
-            {% for attachment in announcement.attachments.all %}
-                <li class="mb-2">
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <a href="{{ attachment.file.url }}" target="_blank">
-                            {{ attachment.file.name|basename }}
-                        </a>
+                                    <div class="ca-attachment-box mt-3">
+                                        <div class="ca-attachment-title">Attached Materials</div>
 
-                        {% if can_manage_course %}
-                            <form method="post"
-                                  action="{% url 'courses:announcement_attachment_delete' attachment.pk %}"
-                                  onsubmit="return confirm('Delete this announcement attachment?');">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    Delete
-                                </button>
-                            </form>
-                        {% endif %}
+                                        <div class="ca-attachment-list">
+                                            {% for attachment in announcement.attachments.all %}
+                                                <div class="ca-attachment-item">
+                                                    <a href="{{ attachment.file.url }}" target="_blank">
+                                                        {{ attachment.file.name|basename }}
+                                                    </a>
+
+                                                    {% if can_manage_course %}
+                                                        <form method="post"
+                                                              action="{% url 'courses:announcement_attachment_delete' attachment.pk %}"
+                                                              onsubmit="return confirm('Delete this announcement attachment?');">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                {% if can_manage_course %}
+                                    <div class="mt-3">
+                                        <a href="{% url 'courses:announcement_attachment_add' announcement.pk %}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Add More Files
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </article>
+                        {% endfor %}
                     </div>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
+                {% else %}
+                    <div class="ca-empty-state">
+                        No announcements have been posted for this course yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
 
-{% if can_manage_course %}
-    <div class="mt-3">
-        <a href="{% url 'courses:announcement_attachment_add' announcement.pk %}"
-           class="btn btn-sm btn-outline-primary">
-            Add More Files
-        </a>
-    </div>
-{% endif %}
+        <div class="col-lg-4">
+            <div class="ca-panel mb-4">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>Course Overview</h5>
+                        <p>Basic course information.</p>
+                    </div>
+                </div>
+
+                <div class="ca-info-list">
+                    <div>
+                        <span>Course Code</span>
+                        <strong>{{ course.code }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Created By</span>
+                        <strong>{{ course.created_by.full_name|default:course.created_by.username }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Created At</span>
+                        <strong>{{ course.created_at|date:"M d, Y h:i A" }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Discussion Threads</span>
+                        <strong>{{ course.discussion_threads.count }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Consultation Requests</span>
+                        <strong>{{ course.consultation_requests.count }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Peer Mentors</span>
+                        <strong>{{ course.course_mentors.count }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ca-panel mb-4">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>Instructors</h5>
+                        <p>Assigned course instructors.</p>
+                    </div>
+                </div>
+
+                {% if course.course_instructors.all %}
+                    <div class="ca-list-stack">
+                        {% for item in course.course_instructors.all %}
+                            <div class="ca-person-item">
+                                <div class="ca-avatar">{{ item.instructor.username|first|upper }}</div>
+                                <div>
+                                    <strong>{{ item.instructor.full_name|default:item.instructor.username }}</strong>
+                                    <p>{{ item.instructor.email|default:"No email added" }}</p>
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="text-muted mb-0">No announcements posted for this course yet.</p>
+                    <div class="ca-empty-state">No instructor assigned.</div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <div class="col-lg-5">
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Student List</h5>
+    {% if can_manage_course %}
+        <div class="ca-panel">
+            <div class="ca-panel-header">
+                <div>
+                    <h5>Student List</h5>
+                    <p>Students enrolled in this course.</p>
+                </div>
+            </div>
 
-                {% if students %}
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
+            {% if course.enrollments.all %}
+                <div class="table-responsive">
+                    <table class="table ca-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Enrolled At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in course.enrollments.all %}
                                 <tr>
-                                    <th>Username</th>
-                                    <th>Full Name</th>
+                                    <td>{{ enrollment.student.username }}</td>
+                                    <td>{{ enrollment.student.full_name|default:"—" }}</td>
+                                    <td>{{ enrollment.student.email|default:"—" }}</td>
+                                    <td>{{ enrollment.enrolled_at|date:"M d, Y h:i A" }}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in students %}
-                                    <tr>
-                                        <td>{{ item.student.username }}</td>
-                                        <td>{{ item.student.full_name|default:"-" }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <p class="text-muted mb-0">No students enrolled yet.</p>
-                {% endif %}
-            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="ca-empty-state">No students enrolled yet.</div>
+            {% endif %}
         </div>
-    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,199 +1,219 @@
 {% extends 'base.html' %}
 {% load file_extras %}
+
 {% block title %}{{ assignment.title }} | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
-    <div>
-        <span class="badge bg-primary mb-2">{{ assignment.course.code }}</span>
-        <h1 class="h2 mb-1">{{ assignment.title }}</h1>
-        <p class="text-muted mb-0">{{ assignment.description|default:"No assignment description available yet." }}</p>
-    </div>
+<div class="container ca-shell ca-workflow-wrap">
+    <section class="ca-page-hero">
+        <div>
+            <span class="ca-course-code">{{ assignment.course.code }}</span>
+            <h1>{{ assignment.title }}</h1>
+            <p>{{ assignment.description|default:"No assignment description has been added." }}</p>
+        </div>
 
-    <div class="d-flex gap-2">
-        <a href="{% url 'assignments:assignment_list' assignment.course.pk %}" class="btn btn-outline-secondary">
-            Back to Assignments
-        </a>
-
-        {% if can_manage_assignment %}
-    <a href="{% url 'assignments:assignment_update' assignment.pk %}" class="btn btn-outline-primary">
-        Edit Assignment
-    </a>
-{% endif %}
-
-        {% if can_submit %}
-            <a href="{% url 'assignments:submit_assignment' assignment.pk %}" class="btn btn-primary">
-                Submit Assignment
+        <div class="ca-page-hero-actions">
+            <a href="{% url 'assignments:assignment_list' assignment.course.pk %}" class="btn btn-outline-ca-light">
+                Back to Assignments
             </a>
-        {% endif %}
-    </div>
-</div>
 
-<div class="row g-4">
-    <div class="col-lg-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <h5 class="card-title">Assignment Info</h5>
-                <p class="mb-2"><strong>Course:</strong> {{ assignment.course }}</p>
-                <p class="mb-2"><strong>Deadline:</strong> {{ assignment.deadline|date:"M d, Y h:i A" }}</p>
-                <p class="mb-2"><strong>Max Marks:</strong> {{ assignment.max_marks }}</p>
-                <hr>
-<h6 class="mb-2">Assignment Resources</h6>
+            {% if can_manage_assignment %}
+                <a href="{% url 'assignments:assignment_update' assignment.pk %}" class="btn btn-ca-gold">
+                    Edit Assignment
+                </a>
+            {% endif %}
+        </div>
+    </section>
 
-{% if assignment.attachments.all %}
-    <ul class="mb-0">
-        {% for attachment in assignment.attachments.all %}
-            <li class="mb-2">
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <a href="{{ attachment.file.url }}" target="_blank">
-                        {{ attachment.file.name|basename }}
-                    </a>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="ca-panel mb-4">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>Assignment Info</h5>
+                        <p>Deadline, marks, and attached assignment resources.</p>
+                    </div>
+                </div>
 
-                    {% if can_manage_assignment %}
-                        <form method="post"
-                              action="{% url 'assignments:assignment_attachment_delete' attachment.pk %}"
-                              onsubmit="return confirm('Delete this assignment attachment?');">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                Delete
-                            </button>
-                        </form>
+                <div class="ca-info-list mb-4">
+                    <div>
+                        <span>Course</span>
+                        <strong>{{ assignment.course.code }} - {{ assignment.course.title }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Deadline</span>
+                        <strong>{{ assignment.deadline|date:"M d, Y h:i A" }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Max Marks</span>
+                        <strong>{{ assignment.max_marks }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Created By</span>
+                        <strong>{{ assignment.created_by.full_name|default:assignment.created_by.username }}</strong>
+                    </div>
+                </div>
+
+                <div class="ca-attachment-box">
+                    <div class="ca-attachment-title">Assignment Resources</div>
+
+                    {% if assignment.attachments.all %}
+                        <div class="ca-attachment-list">
+                            {% for attachment in assignment.attachments.all %}
+                                <div class="ca-attachment-item">
+                                    <a href="{{ attachment.file.url }}" target="_blank">
+                                        {{ attachment.file.name|basename }}
+                                    </a>
+
+                                    {% if can_manage_assignment %}
+                                        <form method="post"
+                                              action="{% url 'assignments:assignment_attachment_delete' attachment.pk %}"
+                                              onsubmit="return confirm('Delete this assignment attachment?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No files attached to this assignment.</p>
                     {% endif %}
                 </div>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p class="text-muted mb-0">No files attached to this assignment.</p>
-{% endif %}
-                <p class="mb-0"><strong>Created By:</strong> {{ assignment.created_by|default:"N/A" }}</p>
             </div>
-        </div>
-    </div>
 
-    {% if can_submit %}
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h5 class="card-title">My Submission</h5>
+            {% if not can_manage_assignment %}
+                <div class="ca-panel">
+                    <div class="ca-panel-header">
+                        <div>
+                            <h5>My Submission</h5>
+                            <p>Submit or review your uploaded work.</p>
+                        </div>
+                    </div>
 
-                    {% if student_submission %}
-                        <p class="mb-2">
-                            <strong>Status:</strong>
-                            {% if student_submission.status == 'LATE' %}
-                                <span class="badge bg-danger">Late</span>
-                            {% else %}
-                                <span class="badge bg-success">Submitted</span>
-                            {% endif %}
-                        </p>
-                        <p class="mb-2"><strong>Submitted At:</strong> {{ student_submission.submitted_at }}</p>
-                        <p class="mb-2"><strong>Last Updated:</strong> {{ student_submission.last_updated_at }}</p>
-                        <p class="mb-3">
-                            <strong>File:</strong>
-                            <a href="{{ student_submission.file.url }}" target="_blank">Open submission</a>
-                        </p>
+                    {% if submission %}
+                        <div class="ca-submission-card">
+                            <div>
+                                <span class="ca-status green">Submitted</span>
+                                <h6 class="mt-2 mb-1">Submission received</h6>
+                                <p class="text-muted mb-2">
+                                    Submitted at {{ submission.submitted_at|date:"M d, Y h:i A" }}
+                                </p>
 
-                        {% if student_submission.grade %}
-                            <hr>
-                            <h6 class="mb-3">Grade & Feedback</h6>
-                            <p class="mb-2">
-                                <strong>Marks:</strong>
-                                {{ student_submission.grade.marks_obtained }} / {{ assignment.max_marks }}
-                            </p>
-                            <p class="mb-2">
-                                <strong>Feedback:</strong><br>
-                                {{ student_submission.grade.feedback|default:"No feedback provided." }}
-                            </p>
-                            <p class="mb-0">
-                                <strong>Graded At:</strong> {{ student_submission.grade.graded_at }}
-                            </p>
+                                {% if submission.file %}
+                                    <a href="{{ submission.file.url }}" target="_blank">
+                                        {{ submission.file.name|basename }}
+                                    </a>
+                                {% endif %}
+                            </div>
+
+                            <a href="{% url 'assignments:submit_assignment' assignment.pk %}" class="btn btn-outline-primary">
+                                Update Submission
+                            </a>
+                        </div>
+
+                        {% if grade %}
+                            <div class="ca-grade-card mt-3">
+                                <span>Grade & Feedback</span>
+                                <strong>{{ grade.marks_obtained }} / {{ assignment.max_marks }}</strong>
+                                <p>{{ grade.feedback|default:"No feedback added."|linebreaksbr }}</p>
+                            </div>
                         {% else %}
-                            <div class="alert alert-secondary mt-3 mb-0">
+                            <div class="ca-empty-state mt-3">
                                 Your submission has not been graded yet.
                             </div>
                         {% endif %}
-
-                        <a href="{% url 'assignments:submit_assignment' assignment.pk %}" class="btn btn-primary mt-3">
-                            Update Submission
-                        </a>
                     {% else %}
-                        <p class="text-muted mb-3">You have not submitted this assignment yet.</p>
+                        <div class="ca-empty-state mb-3">
+                            You have not submitted this assignment yet.
+                        </div>
 
-                        {% if assignment.is_past_deadline %}
-                            <div class="alert alert-warning">
-                                The deadline has passed. If you submit now, the system will mark it as late.
-                            </div>
-                        {% endif %}
-
-                        <a href="{% url 'assignments:submit_assignment' assignment.pk %}" class="btn btn-primary">
-                            Submit Now
+                        <a href="{% url 'assignments:submit_assignment' assignment.pk %}" class="btn btn-ca-primary">
+                            Submit Assignment
                         </a>
                     {% endif %}
                 </div>
-            </div>
+            {% endif %}
         </div>
-    {% endif %}
-</div>
 
-{% if can_manage_assignment %}
-    <div class="row g-4 mt-1">
-        <div class="col-lg-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">All Submissions</h5>
+        <div class="col-lg-5">
+            {% if can_manage_assignment %}
+                <div class="ca-panel">
+                    <div class="ca-panel-header">
+                        <div>
+                            <h5>Student Submissions</h5>
+                            <p>Review submitted work and publish grades.</p>
+                        </div>
+                    </div>
 
-                    {% if all_submissions %}
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Student</th>
-                                        <th>Status</th>
-                                        <th>Submitted At</th>
-                                        <th>File</th>
-                                        <th>Grade</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for submission in all_submissions %}
-                                        <tr>
-                                            <td>{{ submission.student.full_name|default:submission.student.username }}</td>
-                                            <td>
-                                                {% if submission.status == 'LATE' %}
-                                                    <span class="badge bg-danger">Late</span>
-                                                {% else %}
-                                                    <span class="badge bg-success">Submitted</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>{{ submission.submitted_at }}</td>
-                                            <td>
-                                                <a href="{{ submission.file.url }}" target="_blank">Open file</a>
-                                            </td>
-                                            <td>
-                                                {% if submission.grade %}
-                                                    {{ submission.grade.marks_obtained }} / {{ assignment.max_marks }}
-                                                {% else %}
-                                                    <span class="text-muted">Not graded</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <a href="{% url 'assignments:grade_submission' submission.pk %}"
-                                                   class="btn btn-sm btn-outline-primary">
-                                                    {% if submission.grade %}Update Grade{% else %}Grade{% endif %}
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                    {% if submissions %}
+                        <div class="ca-list-stack">
+                            {% for item in submissions %}
+                                <div class="ca-list-item compact">
+                                    <div>
+                                        <strong>{{ item.student.full_name|default:item.student.username }}</strong>
+                                        <p>
+                                            {{ item.status|title }}
+                                            {% if item.submitted_at %}
+                                                · {{ item.submitted_at|date:"M d, Y h:i A" }}
+                                            {% endif %}
+                                        </p>
+
+                                        {% if item.file %}
+                                            <a href="{{ item.file.url }}" target="_blank">
+                                                {{ item.file.name|basename }}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+
+                                    <a href="{% url 'assignments:grade_submission' item.pk %}" class="btn btn-sm btn-outline-primary">
+                                        Grade
+                                    </a>
+                                </div>
+                            {% endfor %}
                         </div>
                     {% else %}
-                        <p class="text-muted mb-0">No submissions received yet.</p>
+                        <div class="ca-empty-state">
+                            No submissions have been received yet.
+                        </div>
                     {% endif %}
                 </div>
-            </div>
+            {% else %}
+                <div class="ca-panel">
+                    <div class="ca-panel-header">
+                        <div>
+                            <h5>Assignment Status</h5>
+                            <p>Submission and grading summary.</p>
+                        </div>
+                    </div>
+
+                    <div class="ca-info-list">
+                        <div>
+                            <span>Submission</span>
+                            {% if submission %}
+                                <strong>Submitted</strong>
+                            {% else %}
+                                <strong>Not submitted</strong>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <span>Grade</span>
+                            {% if grade %}
+                                <strong>{{ grade.marks_obtained }} / {{ assignment.max_marks }}</strong>
+                            {% else %}
+                                <strong>Not graded</strong>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
-{% endif %}
+</div>
 {% endblock %}
