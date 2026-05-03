@@ -2,17 +2,18 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from apps.assignments.models import Assignment, Submission
+from apps.consultations.models import ConsultationRequest
 from apps.courses.models import Announcement, Course, CourseInstructor, Enrollment
+from apps.mentorship.models import CourseMentor, MentorshipRequest
 
 from .forms import CustomLoginForm
 from .models import User
-from apps.consultations.models import ConsultationRequest
-from django.db.models import Q
-from apps.mentorship.models import CourseMentor, MentorshipRequest
+
 
 def home(request):
     return render(request, 'home.html')
@@ -56,23 +57,28 @@ def admin_dashboard(request):
         return redirect('accounts:dashboard_redirect')
 
     recent_announcements = Announcement.objects.select_related('course', 'posted_by')[:5]
+    recent_courses = Course.objects.select_related('created_by').order_by('-created_at')[:4]
 
     context = {
-        'mentor_count': CourseMentor.objects.filter(is_active=True).count(),
-        'mentorship_request_count': MentorshipRequest.objects.count(),
-        'pending_mentorship_count': MentorshipRequest.objects.filter(
-        status=MentorshipRequest.Status.PENDING 
-        ).count(),
         'page_title': 'Admin Dashboard',
         'user_count': User.objects.count(),
         'course_count': Course.objects.count(),
         'assignment_count': Assignment.objects.count(),
         'submission_count': Submission.objects.count(),
-        'recent_announcements': recent_announcements,
+
         'consultation_count': ConsultationRequest.objects.count(),
         'pending_consultation_count': ConsultationRequest.objects.filter(
-        status=ConsultationRequest.Status.PENDING
-).count(),
+            status=ConsultationRequest.Status.PENDING
+        ).count(),
+
+        'mentor_count': CourseMentor.objects.filter(is_active=True).count(),
+        'mentorship_request_count': MentorshipRequest.objects.count(),
+        'pending_mentorship_count': MentorshipRequest.objects.filter(
+            status=MentorshipRequest.Status.PENDING
+        ).count(),
+
+        'recent_announcements': recent_announcements,
+        'recent_courses': recent_courses,
     }
     return render(request, 'accounts/admin_dashboard.html', context)
 
@@ -91,34 +97,48 @@ def instructor_dashboard(request):
         course__course_instructors__instructor=request.user
     ).select_related('course', 'posted_by').distinct()[:5]
 
+    recent_submissions = Submission.objects.filter(
+        assignment__course__course_instructors__instructor=request.user
+    ).select_related('assignment', 'student').distinct().order_by('-submitted_at')[:5]
+
     context = {
-        'mentor_count': CourseMentor.objects.filter(
-    course__course_instructors__instructor=request.user,
-    is_active=True
-).distinct().count(),
-'mentorship_request_count': MentorshipRequest.objects.filter(
-    course__course_instructors__instructor=request.user
-).distinct().count(),
-'pending_mentorship_count': MentorshipRequest.objects.filter(
-    course__course_instructors__instructor=request.user,
-    status=MentorshipRequest.Status.PENDING
-).distinct().count(),
-        'consultation_count': ConsultationRequest.objects.filter(
-    course__course_instructors__instructor=request.user
-).distinct().count(),
-'pending_consultation_count': ConsultationRequest.objects.filter(
-    course__course_instructors__instructor=request.user,
-    status=ConsultationRequest.Status.PENDING
-).distinct().count(),
         'page_title': 'Instructor Dashboard',
+        'assigned_courses': assigned_courses[:4],
         'assigned_course_count': assigned_courses.count(),
+
         'assignment_count': Assignment.objects.filter(
             course__course_instructors__instructor=request.user
         ).distinct().count(),
+
         'submission_count': Submission.objects.filter(
             assignment__course__course_instructors__instructor=request.user
         ).distinct().count(),
+
+        'consultation_count': ConsultationRequest.objects.filter(
+            course__course_instructors__instructor=request.user
+        ).distinct().count(),
+
+        'pending_consultation_count': ConsultationRequest.objects.filter(
+            course__course_instructors__instructor=request.user,
+            status=ConsultationRequest.Status.PENDING
+        ).distinct().count(),
+
+        'mentor_count': CourseMentor.objects.filter(
+            course__course_instructors__instructor=request.user,
+            is_active=True
+        ).distinct().count(),
+
+        'mentorship_request_count': MentorshipRequest.objects.filter(
+            course__course_instructors__instructor=request.user
+        ).distinct().count(),
+
+        'pending_mentorship_count': MentorshipRequest.objects.filter(
+            course__course_instructors__instructor=request.user,
+            status=MentorshipRequest.Status.PENDING
+        ).distinct().count(),
+
         'recent_announcements': recent_announcements,
+        'recent_submissions': recent_submissions,
     }
     return render(request, 'accounts/instructor_dashboard.html', context)
 
@@ -137,34 +157,49 @@ def student_dashboard(request):
         course__enrollments__student=request.user
     ).select_related('course', 'posted_by').distinct()[:5]
 
+    upcoming_assignments = Assignment.objects.filter(
+        course__enrollments__student=request.user
+    ).select_related('course').distinct().order_by('deadline')[:5]
+
     context = {
-        'mentor_count': CourseMentor.objects.filter(
-    student=request.user,
-    is_active=True
-).count(),
-'mentorship_request_count': MentorshipRequest.objects.filter(
-    Q(requester=request.user) | Q(mentor__student=request.user)
-).distinct().count(),
-'pending_mentorship_count': MentorshipRequest.objects.filter(
-    Q(requester=request.user) | Q(mentor__student=request.user),
-    status=MentorshipRequest.Status.PENDING
-).distinct().count(),
         'page_title': 'Student Dashboard',
+        'enrolled_courses': enrolled_courses[:4],
+        'upcoming_assignments': upcoming_assignments,
+
         'enrolled_course_count': enrolled_courses.count(),
+
         'assignment_count': Assignment.objects.filter(
             course__enrollments__student=request.user
         ).distinct().count(),
+
         'submission_count': Submission.objects.filter(
             student=request.user
         ).count(),
-        'recent_announcements': recent_announcements,
+
         'consultation_count': ConsultationRequest.objects.filter(
-    student=request.user
-).count(),
-'pending_consultation_count': ConsultationRequest.objects.filter(
-    student=request.user,
-    status=ConsultationRequest.Status.PENDING
-).count(),
+            student=request.user
+        ).count(),
+
+        'pending_consultation_count': ConsultationRequest.objects.filter(
+            student=request.user,
+            status=ConsultationRequest.Status.PENDING
+        ).count(),
+
+        'mentor_count': CourseMentor.objects.filter(
+            student=request.user,
+            is_active=True
+        ).count(),
+
+        'mentorship_request_count': MentorshipRequest.objects.filter(
+            Q(requester=request.user) | Q(mentor__student=request.user)
+        ).distinct().count(),
+
+        'pending_mentorship_count': MentorshipRequest.objects.filter(
+            Q(requester=request.user) | Q(mentor__student=request.user),
+            status=MentorshipRequest.Status.PENDING
+        ).distinct().count(),
+
+        'recent_announcements': recent_announcements,
     }
     return render(request, 'accounts/student_dashboard.html', context)
 

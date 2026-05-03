@@ -3,90 +3,157 @@
 {% block title %}Student Dashboard | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="mb-4">
-    <h1 class="h2">Student Dashboard</h1>
-    <p class="text-muted">Track your courses, assignments, submissions, and important course announcements.</p>
-</div>
+<div class="container ca-shell ca-dashboard-wrap">
+    <section class="ca-dashboard-hero student">
+        <div>
+            <span class="ca-dashboard-kicker">Student Workspace</span>
+            <h1>Welcome back, {{ user.full_name|default:user.username }}</h1>
+            <p>Track your courses, assignments, submissions, announcements, consultations, and mentoring activity.</p>
+        </div>
 
-<div class="row g-4 mb-4">
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-muted small">Enrolled Courses</div>
-                <div class="display-6">{{ enrolled_course_count }}</div>
-            </div>
+        <div class="ca-dashboard-actions">
+            <a href="{% url 'courses:course_list' %}" class="btn btn-ca-gold">Open My Courses</a>
+            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-ca-light">Request Support</a>
+        </div>
+    </section>
+
+    <div class="ca-stat-grid">
+        <div class="ca-dashboard-stat green">
+            <span>Enrolled Courses</span>
+            <strong>{{ enrolled_course_count }}</strong>
+            <small>Active course spaces</small>
+        </div>
+
+        <div class="ca-dashboard-stat gold">
+            <span>Assignments</span>
+            <strong>{{ assignment_count }}</strong>
+            <small>Course tasks</small>
+        </div>
+
+        <div class="ca-dashboard-stat green">
+            <span>My Submissions</span>
+            <strong>{{ submission_count }}</strong>
+            <small>Submitted work</small>
+        </div>
+
+        <div class="ca-dashboard-stat red">
+            <span>Consultations</span>
+            <strong>{{ consultation_count }}</strong>
+            <small>{{ pending_consultation_count }} pending</small>
+        </div>
+
+        <div class="ca-dashboard-stat gold">
+            <span>Mentorship</span>
+            <strong>{{ mentorship_request_count }}</strong>
+            <small>{{ pending_mentorship_count }} pending</small>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-muted small">Assignments</div>
-                <div class="display-6">{{ assignment_count }}</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-muted small">My Submissions</div>
-                <div class="display-6">{{ submission_count }}</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="col-md-4">
-    <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-            <div class="text-muted small">My Consultations</div>
-            <div class="display-6">{{ consultation_count }}</div>
-            <div class="small text-muted">{{ pending_consultation_count }} pending</div>
-        </div>
-    </div>
-</div>
-
-<div class="row g-4">
-    <div class="col-lg-7">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Recent Course Announcements</h5>
+    <div class="row g-4 mt-1">
+        <div class="col-lg-7">
+            <div class="ca-panel h-100">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>Recent Course Announcements</h5>
+                        <p>Latest updates from your enrolled courses.</p>
+                    </div>
+                </div>
 
                 {% if recent_announcements %}
-                    <div class="d-flex flex-column gap-3">
+                    <div class="ca-list-stack">
                         {% for announcement in recent_announcements %}
-                            <div class="border rounded-4 p-3">
-                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-                                    <div>
-                                        <div class="fw-semibold">{{ announcement.title }}</div>
-                                        <div class="small text-muted">
-                                            {{ announcement.course.code }} • {{ announcement.created_at|date:"M d, Y h:i A" }}
-                                        </div>
-                                    </div>
-
-                                    {% if announcement.is_pinned %}
-                                        <span class="badge bg-warning text-dark">Pinned</span>
-                                    {% endif %}
+                            <div class="ca-list-item">
+                                <div>
+                                    <strong>{{ announcement.title }}</strong>
+                                    <p>{{ announcement.course.code }} · {{ announcement.created_at|date:"M d, Y h:i A" }}</p>
+                                    <span>{{ announcement.message|truncatechars:130 }}</span>
                                 </div>
 
-                                <p class="mb-0 mt-2 text-muted">{{ announcement.message|truncatechars:150 }}</p>
+                                {% if announcement.is_pinned %}
+                                    <span class="ca-status gold">Pinned</span>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="text-muted mb-0">No announcements available yet.</p>
+                    <div class="ca-empty-state">No announcements available yet.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="ca-panel h-100">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>Upcoming Assignments</h5>
+                        <p>Nearest deadlines from your courses.</p>
+                    </div>
+                </div>
+
+                {% if upcoming_assignments %}
+                    <div class="ca-list-stack">
+                        {% for assignment in upcoming_assignments %}
+                            <div class="ca-list-item compact">
+                                <div>
+                                    <strong>{{ assignment.title }}</strong>
+                                    <p>{{ assignment.course.code }} · Due {{ assignment.deadline|date:"M d, Y h:i A" }}</p>
+                                </div>
+                                <a href="{% url 'assignments:assignment_detail' assignment.pk %}" class="btn btn-sm btn-outline-primary">
+                                    View
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="ca-empty-state">No assignments found.</div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <div class="col-lg-5">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Quick Actions</h5>
-                <div class="d-grid gap-2">
-                    <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Open My Courses</a>
+    <div class="row g-4 mt-1">
+        <div class="col-lg-8">
+            <div class="ca-panel">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>My Courses</h5>
+                        <p>Quick access to your active course spaces.</p>
+                    </div>
+                    <a href="{% url 'courses:course_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+
+                {% if enrolled_courses %}
+                    <div class="row g-3">
+                        {% for course in enrolled_courses %}
+                            <div class="col-md-6">
+                                <div class="ca-course-mini">
+                                    <span class="badge bg-primary">{{ course.code }}</span>
+                                    <h6>{{ course.title }}</h6>
+                                    <a href="{% url 'courses:course_detail' course.pk %}">Open Course Hub</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="ca-empty-state">No enrolled courses available.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="ca-panel">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>Quick Actions</h5>
+                        <p>Common student tasks.</p>
+                    </div>
+                </div>
+
+                <div class="ca-quick-grid">
+                    <a href="{% url 'courses:course_list' %}">View Courses</a>
+                    <a href="{% url 'courses:course_list' %}">Assignments</a>
+                    <a href="{% url 'courses:course_list' %}">Consultation</a>
+                    <a href="{% url 'courses:course_list' %}">Find Mentor</a>
                 </div>
             </div>
         </div>
