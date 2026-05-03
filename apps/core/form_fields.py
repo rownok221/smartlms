@@ -37,6 +37,8 @@ class MultipleFileField(forms.FileField):
 
     def clean(self, data, initial=None):
         if not data:
+            if self.required:
+                raise forms.ValidationError("Please select at least one file.")
             return []
 
         single_file_clean = super().clean

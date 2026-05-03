@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.accounts.models import User
 
-from .forms import AnnouncementForm, CourseForm
+from .forms import AnnouncementAttachmentForm, AnnouncementForm, CourseForm
 from .models import Announcement, AnnouncementAttachment, Course, CourseInstructor, Enrollment
 
 
@@ -18,6 +18,14 @@ def is_instructor(user):
 
 def is_student(user):
     return user.role == User.Role.STUDENT
+
+def save_announcement_attachments(announcement, files, uploaded_by):
+    for file in files:
+        AnnouncementAttachment.objects.create(
+            announcement=announcement,
+            file=file,
+            uploaded_by=uploaded_by
+        )
 
 
 @login_required
@@ -140,12 +148,11 @@ def announcement_create(request, course_pk):
             announcement.posted_by = request.user
             announcement.save()
 
-            for file in form.cleaned_data.get('attachments', []):
-                AnnouncementAttachment.objects.create(
-                    announcement=announcement,
-                    file=file,
-                    uploaded_by=request.user
-                )
+            save_announcement_attachments(
+    announcement=announcement,
+    files=form.cleaned_data.get('attachments', []),
+    uploaded_by=request.user
+)
 
             messages.success(request, 'Announcement posted successfully.')
             return redirect('courses:course_detail', pk=course.pk)
@@ -156,3 +163,60 @@ def announcement_create(request, course_pk):
             'form': form,
         }
         return render(request, 'courses/announcement_form.html', context)
+
+@login_required
+def announcement_attachment_add(request, pk):
+    announcement = get_object_or_404(
+        Announcement.objects.select_related('course', 'posted_by').prefetch_related('attachments'),
+        pk=pk
+    )
+    course = announcement.course
+
+    if not (is_admin(request.user) or CourseInstructor.objects.filter(course=course, instructor=request.user).exists()):
+        messages.error(request, 'You are not authorized to add files to this announcement.')
+        return redirect('courses:course_detail', pk=course.pk)
+
+    if request.method == 'POST':
+        form = AnnouncementAttachmentForm(request.POST, request.FILES)
+        if form.is_valid():
+            save_announcement_attachments(
+                announcement=announcement,
+                files=form.cleaned_data.get('attachments', []),
+                uploaded_by=request.user
+            )
+
+            messages.success(request, 'Files added to announcement successfully.')
+            return redirect('courses:course_detail', pk=course.pk)
+    else:
+        form = AnnouncementAttachmentForm()
+
+    context = {
+        'course': course,
+        'announcement': announcement,
+        'form': form,
+    }
+    return render(request, 'courses/announcement_attachment_form.html', context)
+
+@login_required
+def announcement_attachment_delete(request, pk):
+    attachment = get_object_or_404(
+        AnnouncementAttachment.objects.select_related('announcement', 'announcement__course'),
+        pk=pk
+    )
+    announcement = attachment.announcement
+    course = announcement.course
+
+    if request.method != 'POST':
+        return redirect('courses:course_detail', pk=course.pk)
+
+    if not (is_admin(request.user) or CourseInstructor.objects.filter(course=course, instructor=request.user).exists()):
+        messages.error(request, 'You are not authorized to delete this announcement attachment.')
+        return redirect('courses:course_detail', pk=course.pk)
+
+    if attachment.file:
+        attachment.file.delete(save=False)
+
+    attachment.delete()
+
+    messages.success(request, 'Announcement attachment deleted successfully.')
+    return redirect('courses:course_detail', pk=course.pk)

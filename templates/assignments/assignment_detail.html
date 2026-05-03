@@ -15,6 +15,12 @@
             Back to Assignments
         </a>
 
+        {% if can_manage_assignment %}
+    <a href="{% url 'assignments:assignment_update' assignment.pk %}" class="btn btn-outline-primary">
+        Edit Assignment
+    </a>
+{% endif %}
+
         {% if can_submit %}
             <a href="{% url 'assignments:submit_assignment' assignment.pk %}" class="btn btn-primary">
                 Submit Assignment
@@ -37,10 +43,23 @@
 {% if assignment.attachments.all %}
     <ul class="mb-0">
         {% for attachment in assignment.attachments.all %}
-            <li>
-                <a href="{{ attachment.file.url }}" target="_blank">
-                    {{ attachment.file.name|basename }}
-                </a>
+            <li class="mb-2">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ attachment.file.url }}" target="_blank">
+                        {{ attachment.file.name|basename }}
+                    </a>
+
+                    {% if can_manage_assignment %}
+                        <form method="post"
+                              action="{% url 'assignments:assignment_attachment_delete' attachment.pk %}"
+                              onsubmit="return confirm('Delete this assignment attachment?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                Delete
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
             </li>
         {% endfor %}
     </ul>

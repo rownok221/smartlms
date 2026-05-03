@@ -31,6 +31,13 @@ def can_access_course(user, course):
         return Enrollment.objects.filter(course=course, student=user).exists()
     return False
 
+def save_assignment_attachments(assignment, files, uploaded_by):
+    for file in files:
+        AssignmentAttachment.objects.create(
+            assignment=assignment,
+            file=file,
+            uploaded_by=uploaded_by
+        )
 
 def can_manage_course(user, course):
     if is_admin(user):
@@ -124,12 +131,11 @@ def assignment_create(request, course_pk):
             assignment.created_by = request.user
             assignment.save()
 
-            for file in form.cleaned_data.get('attachments', []):
-                AssignmentAttachment.objects.create(
-                    assignment=assignment,
-                    file=file,
-                    uploaded_by=request.user
-                )
+            save_assignment_attachments(
+    assignment=assignment,
+    files=form.cleaned_data.get('attachments', []),
+    uploaded_by=request.user
+)
 
             messages.success(request, 'Assignment created successfully.')
             return redirect('assignments:assignment_detail', pk=assignment.pk)
@@ -142,6 +148,65 @@ def assignment_create(request, course_pk):
     }
     return render(request, 'assignments/assignment_form.html', context)
 
+@login_required
+def assignment_update(request, pk):
+    assignment = get_object_or_404(
+        Assignment.objects.select_related('course', 'created_by').prefetch_related('attachments'),
+        pk=pk
+    )
+    course = assignment.course
+
+    if not can_manage_course(request.user, course):
+        messages.error(request, 'You are not authorized to edit this assignment.')
+        return redirect('assignments:assignment_detail', pk=assignment.pk)
+
+    if request.method == 'POST':
+        form = AssignmentForm(request.POST, request.FILES, instance=assignment)
+        if form.is_valid():
+            assignment = form.save()
+
+            save_assignment_attachments(
+                assignment=assignment,
+                files=form.cleaned_data.get('attachments', []),
+                uploaded_by=request.user
+            )
+
+            messages.success(request, 'Assignment updated successfully.')
+            return redirect('assignments:assignment_detail', pk=assignment.pk)
+    else:
+        form = AssignmentForm(instance=assignment)
+
+    context = {
+        'course': course,
+        'assignment': assignment,
+        'form': form,
+        'is_update': True,
+    }
+    return render(request, 'assignments/assignment_form.html', context)
+
+@login_required
+def assignment_attachment_delete(request, pk):
+    attachment = get_object_or_404(
+        AssignmentAttachment.objects.select_related('assignment', 'assignment__course'),
+        pk=pk
+    )
+    assignment = attachment.assignment
+    course = assignment.course
+
+    if request.method != 'POST':
+        return redirect('assignments:assignment_detail', pk=assignment.pk)
+
+    if not can_manage_course(request.user, course):
+        messages.error(request, 'You are not authorized to delete this attachment.')
+        return redirect('assignments:assignment_detail', pk=assignment.pk)
+
+    if attachment.file:
+        attachment.file.delete(save=False)
+
+    attachment.delete()
+
+    messages.success(request, 'Assignment attachment deleted successfully.')
+    return redirect('assignments:assignment_detail', pk=assignment.pk)
 
 @login_required
 def submit_assignment(request, pk):

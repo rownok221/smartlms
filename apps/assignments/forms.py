@@ -1,9 +1,17 @@
 from django import forms
+from django.utils import timezone
+
 from apps.core.form_fields import MultipleFileField
+
 from .models import Assignment, Grade, Submission
 
 
 class AssignmentForm(forms.ModelForm):
+    attachments = MultipleFileField(
+        required=False,
+        help_text="Optional: attach question PDF, instructions, slides, or reference files."
+    )
+
     deadline = forms.DateTimeField(
         input_formats=['%Y-%m-%dT%H:%M'],
         widget=forms.DateTimeInput(attrs={
@@ -12,11 +20,6 @@ class AssignmentForm(forms.ModelForm):
         })
     )
 
-    attachments = MultipleFileField(
-    required=False,
-    help_text="Optional: attach question PDF, instructions, slides, or reference files."
-)
-        
     class Meta:
         model = Assignment
         fields = ['title', 'description', 'deadline', 'max_marks', 'attachments']
@@ -36,6 +39,13 @@ class AssignmentForm(forms.ModelForm):
                 'min': 1,
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.pk and self.instance.deadline:
+            deadline = timezone.localtime(self.instance.deadline)
+            self.initial['deadline'] = deadline.strftime('%Y-%m-%dT%H:%M')
 
 
 class SubmissionForm(forms.ModelForm):
