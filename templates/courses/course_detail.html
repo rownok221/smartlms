@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load file_extras %}
 {% block title %}{{ course.code }} | SmartLMS{% endblock %}
 
 {% block content %}
@@ -122,7 +122,7 @@
             {% for attachment in announcement.attachments.all %}
                 <li>
                     <a href="{{ attachment.file.url }}" target="_blank">
-                        {{ attachment.file.name|cut:"announcement_attachments/" }}
+                        {{ attachment.file.name|basename }}
                     </a>
                 </li>
             {% endfor %}
