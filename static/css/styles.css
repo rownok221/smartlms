@@ -1643,3 +1643,24 @@ body {
     border-color: var(--ca-green);
     box-shadow: 0 0 0 0.18rem rgba(15, 138, 43, 0.16);
 }
+/* Contact admin password recovery */
+
+.ca-contact-admin-box {
+    padding: 1rem;
+    border-radius: 16px;
+    background: #F8FAF8;
+    border: 1px solid var(--ca-border);
+}
+
+.ca-contact-admin-box strong {
+    display: block;
+    color: var(--ca-green-dark);
+    font-weight: 900;
+    margin-bottom: 0.35rem;
+}
+
+.ca-contact-admin-box p {
+    color: var(--ca-muted);
+    margin: 0;
+    line-height: 1.6;
+}

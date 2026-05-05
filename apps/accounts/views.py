@@ -18,6 +18,8 @@ from .models import User
 def home(request):
     return render(request, 'home.html')
 
+def password_reset_info(request):
+    return render(request, 'accounts/password_reset_contact_admin.html')
 
 class UserLoginView(LoginView):
     template_name = 'accounts/login.html'

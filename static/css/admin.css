@@ -1,0 +1,186 @@
+:root {
+    --ca-green: #0F8A2B;
+    --ca-green-dark: #173726;
+    --ca-gold: #E0B100;
+    --ca-red: #D71920;
+    --ca-bg: #F5F7F5;
+    --ca-border: #DCE5DD;
+}
+
+/* Header */
+
+#header {
+    background: linear-gradient(180deg, #1E2C22, #17231B);
+    color: #ffffff;
+    border-bottom: 3px solid var(--ca-gold);
+}
+
+#branding h1,
+#branding h1 a:link,
+#branding h1 a:visited {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#user-tools {
+    color: #E5E7EB;
+}
+
+#user-tools a {
+    color: #FFF4C8;
+    font-weight: 600;
+}
+
+#user-tools a:hover {
+    color: #ffffff;
+}
+
+/* Breadcrumbs */
+
+div.breadcrumbs {
+    background: #233428;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+div.breadcrumbs a {
+    color: #FFF4C8;
+}
+
+/* Body */
+
+body {
+    background: var(--ca-bg);
+}
+
+#content {
+    padding: 24px 32px;
+}
+
+/* Modules */
+
+.module {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--ca-border);
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.06);
+}
+
+.module h2,
+.module caption,
+.inline-group h2 {
+    background: #2D4A37;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Sidebar app labels */
+
+.app-authentication-and-authorization .section,
+.app-accounts .section,
+.app-courses .section,
+.app-assignments .section,
+.app-consultations .section,
+.app-discussions .section,
+.app-mentorship .section {
+    background: #2D4A37;
+}
+
+/* Links */
+
+a:link,
+a:visited {
+    color: #0A5D1D;
+}
+
+a:hover {
+    color: var(--ca-red);
+}
+
+/* Buttons */
+
+.button,
+input[type=submit],
+input[type=button],
+.submit-row input,
+a.button {
+    background: var(--ca-green);
+    color: #ffffff;
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+}
+
+.button:hover,
+input[type=submit]:hover,
+input[type=button]:hover,
+.submit-row input:hover,
+a.button:hover {
+    background: #0A5D1D;
+}
+
+.button.default,
+input[type=submit].default,
+.submit-row input.default {
+    background: var(--ca-gold);
+    color: #1F2937;
+}
+
+.button.default:hover,
+input[type=submit].default:hover,
+.submit-row input.default:hover {
+    background: #C99F00;
+}
+
+/* Forms */
+
+input[type=text],
+input[type=password],
+input[type=email],
+input[type=url],
+input[type=number],
+textarea,
+select {
+    border-radius: 7px;
+    border: 1px solid var(--ca-border);
+}
+
+input[type=text]:focus,
+input[type=password]:focus,
+input[type=email]:focus,
+input[type=url]:focus,
+input[type=number]:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--ca-green);
+    box-shadow: 0 0 0 3px rgba(15, 138, 43, 0.12);
+}
+
+/* Tables */
+
+#changelist table thead th {
+    background: #EEF6F0;
+    color: #111827;
+}
+
+.row1 {
+    background: #ffffff;
+}
+
+.row2 {
+    background: #F8FAF8;
+}
+
+/* Submit row */
+
+.submit-row {
+    border-radius: 10px;
+    border: 1px solid var(--ca-border);
+    background: #ffffff;
+}
+
+/* Messages */
+
+.messagelist li {
+    border-radius: 8px;
+}
