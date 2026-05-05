@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 
 from apps.accounts.models import User
 from .models import CourseMentor, MentorshipRequest
@@ -99,17 +100,6 @@ class MentorshipResponseForm(forms.ModelForm):
             (MentorshipRequest.Status.COMPLETED, "Completed"),
         ]
 
-    def clean(self):
-        cleaned_data = super().clean()
-        status = cleaned_data.get('status')
-        scheduled_datetime = cleaned_data.get('scheduled_datetime')
-
-        if status in [
-            MentorshipRequest.Status.ACCEPTED,
-            MentorshipRequest.Status.RESCHEDULED,
-        ] and not scheduled_datetime:
-            raise forms.ValidationError(
-                "A scheduled date and time is required when accepting or rescheduling a mentoring request."
-            )
-
-        return cleaned_data
+        if self.instance and self.instance.pk and self.instance.scheduled_datetime:
+            scheduled = timezone.localtime(self.instance.scheduled_datetime)
+            self.initial['scheduled_datetime'] = scheduled.strftime('%Y-%m-%dT%H:%M')
