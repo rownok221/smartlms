@@ -131,6 +131,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'accounts:dashboard_redirect'
 LOGOUT_REDIRECT_URL = 'home'
+# Email configuration for local password reset testing
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'ClassADDA Support <noreply@classadda.local>'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field

@@ -3,78 +3,84 @@
 {% block title %}Courses | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="container ca-page-wrap">
-    <div class="ca-section-header d-flex justify-content-between align-items-start flex-wrap gap-3">
+<div class="container ca-shell ca-workflow-wrap">
+
+    <section class="ca-page-hero ca-courses-hero">
         <div>
-            <h1 class="h2">Courses</h1>
-            <p>Browse course spaces and move seamlessly into assignments, discussions, consultations, and mentorship.</p>
+            <span class="ca-course-code">ClassADDA</span>
+            <h1>Courses</h1>
+            <p>
+                Browse your academic course spaces and move seamlessly into assignments,
+                discussions, consultations, announcements, and peer mentorship.
+            </p>
         </div>
 
-        {% if can_create_course %}
-            <a href="{% url 'courses:course_create' %}" class="btn btn-ca-primary">
-                Create Course
+        <div class="ca-page-hero-actions">
+            <a href="{% url 'accounts:dashboard_redirect' %}" class="btn btn-outline-ca-light">
+                Dashboard
             </a>
-        {% endif %}
-    </div>
+
+            {% if can_create_course %}
+                <a href="{% url 'courses:course_create' %}" class="btn btn-ca-gold">
+                    Create Course
+                </a>
+            {% endif %}
+        </div>
+    </section>
 
     {% if courses %}
-        <div class="row g-4">
+        <div class="ca-course-grid">
             {% for course in courses %}
-                <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 ca-card-hover ca-card-accent-green">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-                                <span class="badge bg-primary">{{ course.code }}</span>
-                                <span class="small text-muted">
-                                    {{ course.announcements.count }} announcement{{ course.announcements.count|pluralize }}
-                                </span>
+                <article class="ca-course-card-pro">
+                    <div class="ca-course-card-top">
+                        <span class="ca-course-badge">{{ course.code }}</span>
+                        <span class="ca-course-count">
+                            {{ course.announcements.count }} announcement{{ course.announcements.count|pluralize }}
+                        </span>
+                    </div>
+
+                    <div class="ca-course-card-body">
+                        <h2>{{ course.title }}</h2>
+
+                        <p>
+                            {{ course.description|default:"No description added yet."|truncatechars:150 }}
+                        </p>
+
+                        <div class="ca-course-stats-row">
+                            <div>
+                                <span>Instructors</span>
+                                <strong>{{ course.course_instructors.count }}</strong>
                             </div>
 
-                            <h5 class="card-title mb-2">{{ course.title }}</h5>
-
-                            <p class="text-muted mb-3">
-                                {{ course.description|default:"No description added yet."|truncatechars:130 }}
-                            </p>
-
-                            <div class="row g-2 mb-4">
-                                <div class="col-6">
-                                    <div class="p-3 rounded-3 border bg-white">
-                                        <div class="small text-muted">Instructors</div>
-                                        <strong>{{ course.course_instructors.count }}</strong>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="p-3 rounded-3 border bg-white">
-                                        <div class="small text-muted">Students</div>
-                                        <strong>{{ course.enrollments.count }}</strong>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="d-grid gap-2 mb-3">
-                                <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-ca-primary">
-                                    Open Course Hub
-                                </a>
-                            </div>
-
-                            <div class="ca-action-grid">
-                                <a href="{% url 'assignments:assignment_list' course.pk %}" class="ca-action-chip">Assignments</a>
-                                <a href="{% url 'discussions:thread_list' course.pk %}" class="ca-action-chip">Discussions</a>
-                                <a href="{% url 'consultations:consultation_list' course.pk %}" class="ca-action-chip">Consult</a>
-                                <a href="{% url 'mentorship:mentor_list' course.pk %}" class="ca-action-chip">Mentors</a>
+                            <div>
+                                <span>Students</span>
+                                <strong>{{ course.enrollments.count }}</strong>
                             </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="ca-course-card-actions">
+                        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-ca-primary w-100">
+                            Open Course Hub
+                        </a>
+
+                        <div class="ca-course-shortcuts">
+                            <a href="{% url 'assignments:assignment_list' course.pk %}">Assignments</a>
+                            <a href="{% url 'discussions:thread_list' course.pk %}">Discussions</a>
+                            <a href="{% url 'consultations:consultation_list' course.pk %}">Consultation</a>
+                            <a href="{% url 'mentorship:mentor_list' course.pk %}">Mentors</a>
+                        </div>
+                    </div>
+                </article>
             {% endfor %}
         </div>
     {% else %}
-        <div class="card ca-card-accent-gold">
-            <div class="card-body p-4">
-                <h5 class="mb-2">No courses available</h5>
-                <p class="text-muted mb-0">There are no visible courses for your account yet.</p>
+        <div class="ca-panel">
+            <div class="ca-empty-state">
+                No courses are available for your account yet.
             </div>
         </div>
     {% endif %}
+
 </div>
 {% endblock %}
