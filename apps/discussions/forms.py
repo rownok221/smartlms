@@ -6,19 +6,16 @@ from .models import DiscussionReply, DiscussionThread
 class DiscussionThreadForm(forms.ModelForm):
     class Meta:
         model = DiscussionThread
-        fields = ['title', 'category', 'content']
+        fields = ['title', 'content']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter discussion title',
-            }),
-            'category': forms.Select(attrs={
-                'class': 'form-select',
+                'placeholder': 'Example: Need help understanding the assignment requirement',
             }),
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Write your discussion topic or question',
                 'rows': 6,
+                'placeholder': 'Write your question or discussion topic clearly.',
             }),
         }
 
@@ -30,7 +27,7 @@ class DiscussionReplyForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Write your reply',
-                'rows': 4,
+                'rows': 5,
+                'placeholder': 'Write your reply...',
             }),
         }

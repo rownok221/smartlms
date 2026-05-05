@@ -21,7 +21,14 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="ca-panel">
-                <form method="post">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>Discussion Details</h5>
+                        <p>Ask a clear course-related question or start a relevant academic discussion.</p>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'discussions:thread_create' course.pk %}">
                     {% csrf_token %}
 
                     {% if form.non_field_errors %}

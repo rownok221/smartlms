@@ -16,7 +16,7 @@
                 Back to Discussions
             </a>
 
-            {% if can_manage_discussion or can_manage_discussions or can_manage_course %}
+            {% if can_manage_discussion %}
                 <form method="post" action="{% url 'discussions:toggle_thread_pin' thread.pk %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-ca-gold">

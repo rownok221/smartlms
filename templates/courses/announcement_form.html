@@ -3,20 +3,42 @@
 {% block title %}Post Announcement | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-body p-4">
-                <h1 class="h3 mb-3">Post Announcement</h1>
-                <p class="text-muted mb-4">
-                    Add a course announcement for {{ course.code }} - {{ course.title }}.
-                </p>
+<div class="container ca-shell ca-workflow-wrap">
+    <section class="ca-page-hero">
+        <div>
+            <span class="ca-course-code">{{ course.code }}</span>
+            <h1>Post Announcement</h1>
+            <p>Share notices, study materials, lecture slides, practice questions, or important course updates for {{ course.title }}.</p>
+        </div>
+
+        <div class="ca-page-hero-actions">
+            <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-ca-light">
+                Back to Course
+            </a>
+        </div>
+    </section>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="ca-panel">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>Announcement Details</h5>
+                        <p>Write a clear course announcement and optionally attach supporting files.</p>
+                    </div>
+                </div>
 
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
 
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
                     <div class="mb-3">
-                        <label class="form-label">Title</label>
+                        <label class="form-label">Announcement Title</label>
                         {{ form.title }}
                         {% if form.title.errors %}
                             <div class="text-danger small mt-1">{{ form.title.errors }}</div>
@@ -31,26 +53,32 @@
                         {% endif %}
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">Attached Materials</label>
+                        {{ form.attachments }}
+                        {% if form.attachments.errors %}
+                            <div class="text-danger small mt-1">{{ form.attachments.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">
+                            Optional. Upload PDF, DOC/DOCX, PPT/PPTX, TXT, ZIP, JPG, or PNG files.
+                        </div>
+                    </div>
+
                     <div class="form-check mb-4">
                         {{ form.is_pinned }}
                         <label class="form-check-label" for="{{ form.is_pinned.id_for_label }}">
                             Pin this announcement
                         </label>
                     </div>
-<div class="mb-3">
-    <label class="form-label">Attachment Files</label>
-    {{ form.attachments }}
-    {% if form.attachments.errors %}
-        <div class="text-danger small mt-1">{{ form.attachments.errors }}</div>
-    {% endif %}
-    <div class="form-text">
-        Optional. Upload lecture slides, PDFs, notes, practice questions, ZIP files, or images.
-        Maximum file size: 20 MB each.
-    </div>
-</div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Post Announcement</button>
-                        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-secondary">Cancel</a>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" class="btn btn-ca-primary">
+                            Post Announcement
+                        </button>
+
+                        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-primary">
+                            Cancel
+                        </a>
                     </div>
                 </form>
             </div>

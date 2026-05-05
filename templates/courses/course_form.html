@@ -3,17 +3,39 @@
 {% block title %}Create Course | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-body p-4">
-                <h1 class="h3 mb-3">Create Course</h1>
-                <p class="text-muted mb-4">
-                    Add a new course space to ClassADDA.
-                </p>
+<div class="container ca-shell ca-workflow-wrap">
+    <section class="ca-page-hero">
+        <div>
+            <span class="ca-course-code">ClassADDA</span>
+            <h1>Create Course</h1>
+            <p>Create a new academic course space for instructors, students, assignments, announcements, discussions, consultations, and peer mentoring.</p>
+        </div>
+
+        <div class="ca-page-hero-actions">
+            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-ca-light">
+                Back to Courses
+            </a>
+        </div>
+    </section>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="ca-panel">
+                <div class="ca-panel-header">
+                    <div>
+                        <h5>Course Information</h5>
+                        <p>Enter the official course title, code, and description.</p>
+                    </div>
+                </div>
 
                 <form method="post">
                     {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
 
                     <div class="mb-3">
                         <label class="form-label">Course Title</label>
@@ -31,7 +53,7 @@
                         {% endif %}
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label class="form-label">Description</label>
                         {{ form.description }}
                         {% if form.description.errors %}
@@ -39,9 +61,14 @@
                         {% endif %}
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Create Course</button>
-                        <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" class="btn btn-ca-primary">
+                            Create Course
+                        </button>
+
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-outline-primary">
+                            Cancel
+                        </a>
                     </div>
                 </form>
             </div>

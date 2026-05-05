@@ -1778,3 +1778,65 @@ body {
 .ca-quick-grid a:hover {
     text-decoration: none;
 }
+/* Final form polish for course, announcement, and discussion forms */
+
+.ca-panel form .form-control,
+.ca-panel form .form-select,
+.ca-panel form textarea,
+.ca-panel form input[type="text"],
+.ca-panel form input[type="email"],
+.ca-panel form input[type="password"],
+.ca-panel form input[type="number"],
+.ca-panel form input[type="datetime-local"],
+.ca-panel form input[type="file"],
+.ca-panel form select {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--ca-border);
+    padding: 0.72rem 0.9rem;
+    background: #ffffff;
+    color: var(--ca-text);
+    font-weight: 500;
+}
+
+.ca-panel form textarea {
+    resize: vertical;
+    min-height: 140px;
+}
+
+.ca-panel form .form-control:focus,
+.ca-panel form .form-select:focus,
+.ca-panel form textarea:focus,
+.ca-panel form input:focus,
+.ca-panel form select:focus {
+    border-color: var(--ca-green);
+    outline: none;
+    box-shadow: 0 0 0 0.18rem rgba(15, 138, 43, 0.16);
+}
+
+.ca-panel form .form-label {
+    color: var(--ca-text);
+    font-weight: 900;
+    margin-bottom: 0.45rem;
+}
+
+.ca-panel form .form-text {
+    color: var(--ca-muted);
+    font-size: 0.86rem;
+}
+
+.ca-panel form .form-check {
+    padding: 0.85rem 1rem 0.85rem 2.5rem;
+    border: 1px solid var(--ca-border);
+    border-radius: 14px;
+    background: #F8FAF8;
+}
+
+.ca-panel form .form-check-input {
+    margin-top: 0.2rem;
+}
+
+.ca-panel form .form-check-label {
+    font-weight: 800;
+    color: var(--ca-text);
+}
