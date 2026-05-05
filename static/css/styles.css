@@ -35,6 +35,25 @@ body {
 }
 
 /* Navbar */
+
+.ca-navbar .nav-link {
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: 700;
+}
+
+.ca-navbar .nav-link:hover {
+    color: var(--ca-gold);
+}
+
+.ca-navbar .navbar-nav.ms-auto .nav-link {
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
+}
+
+.ca-navbar .navbar-nav.ms-auto .nav-link:hover {
+    background: rgba(255, 255, 255, 0.10);
+}
+
 .ca-navbar {
     background: linear-gradient(180deg, rgba(31, 44, 34, 0.96), rgba(31, 44, 34, 0.92));
     border-bottom: 1px solid rgba(255,255,255,0.08);
