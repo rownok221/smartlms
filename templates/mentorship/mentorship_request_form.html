@@ -3,16 +3,30 @@
 {% block title %}Request Peer Mentoring | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-body p-4">
-                <h1 class="h3 mb-3">Request Peer Mentoring</h1>
+<div class="container ca-shell ca-workflow-wrap">
+    <section class="ca-page-hero">
+        <div>
+            <span class="ca-course-code">{{ course.code }}</span>
+            <h1>Request Peer Mentoring</h1>
+            <p>Ask an approved peer mentor for academic support in {{ course.title }}.</p>
+        </div>
 
-                <div class="alert alert-light border">
-                    <p class="mb-1"><strong>Course:</strong> {{ course.code }} - {{ course.title }}</p>
-                    <p class="mb-1"><strong>Mentor:</strong> {{ mentor.student.full_name|default:mentor.student.username }}</p>
-                    <p class="mb-0"><strong>Expertise:</strong> {{ mentor.expertise }}</p>
+        <div class="ca-page-hero-actions">
+            <a href="{% url 'mentorship:mentor_list' course.pk %}" class="btn btn-outline-ca-light">
+                Cancel
+            </a>
+        </div>
+    </section>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="ca-panel">
+                <div class="ca-note-box mb-4">
+                    <strong>Selected Mentor</strong>
+                    <p class="mb-1">
+                        {{ mentor.student.full_name|default:mentor.student.username }}
+                    </p>
+                    <div class="ca-muted-line">Expertise: {{ mentor.expertise }}</div>
                 </div>
 
                 <form method="post">
@@ -48,10 +62,13 @@
                         {% endif %}
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Submit Request</button>
-                        <a href="{% url 'mentorship:mentor_list' course.pk %}" class="btn btn-outline-secondary">
-                            Cancel
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" class="btn btn-ca-primary">
+                            Submit Request
+                        </button>
+
+                        <a href="{% url 'mentorship:mentor_list' course.pk %}" class="btn btn-outline-primary">
+                            Back to Mentorship
                         </a>
                     </div>
                 </form>

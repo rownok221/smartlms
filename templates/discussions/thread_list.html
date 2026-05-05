@@ -3,64 +3,76 @@
 {% block title %}Discussions | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
-    <div>
-        <span class="badge bg-primary mb-2">{{ course.code }}</span>
-        <h1 class="h2 mb-1">Discussion Forum</h1>
-        <p class="text-muted mb-0">Course-wide academic discussion space for {{ course.title }}.</p>
-    </div>
+<div class="container ca-shell ca-workflow-wrap">
+    <section class="ca-page-hero">
+        <div>
+            <span class="ca-course-code">{{ course.code }}</span>
+            <h1>Course Discussions</h1>
+            <p>Ask questions, share academic ideas, and follow moderated course discussions for {{ course.title }}.</p>
+        </div>
 
-    <div class="d-flex gap-2">
-        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-secondary">
-            Back to Course
-        </a>
-        <a href="{% url 'discussions:thread_create' course.pk %}" class="btn btn-primary">
-            Start Discussion
-        </a>
-    </div>
-</div>
+        <div class="ca-page-hero-actions">
+            <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-ca-light">
+                Back to Course
+            </a>
 
-{% if threads %}
-    <div class="d-flex flex-column gap-3">
-        {% for thread in threads %}
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-                        <div>
-                            <div class="d-flex gap-2 align-items-center mb-2 flex-wrap">
-                                <span class="badge bg-secondary">{{ thread.get_category_display }}</span>
+            <a href="{% url 'discussions:thread_create' course.pk %}" class="btn btn-ca-gold">
+                Start Discussion
+            </a>
+        </div>
+    </section>
+
+    <div class="ca-panel">
+        <div class="ca-panel-header">
+            <div>
+                <h5>Discussion Threads</h5>
+                <p>Course-wise moderated academic discussion space.</p>
+            </div>
+        </div>
+
+        {% if threads %}
+            <div class="ca-thread-list">
+                {% for thread in threads %}
+                    <article class="ca-thread-card">
+                        <div class="ca-thread-main">
+                            <div class="d-flex gap-2 flex-wrap mb-2">
                                 {% if thread.is_pinned %}
-                                    <span class="badge bg-warning text-dark">Pinned</span>
+                                    <span class="ca-status gold">Pinned</span>
                                 {% endif %}
+
                                 {% if thread.is_locked %}
-                                    <span class="badge bg-danger">Locked</span>
+                                    <span class="ca-status red">Locked</span>
                                 {% endif %}
                             </div>
 
-                            <h5 class="mb-1">{{ thread.title }}</h5>
-                            <div class="small text-muted">
-                                Started by {{ thread.created_by|default:"N/A" }}
-                                • {{ thread.created_at|date:"M d, Y h:i A" }}
-                                • {{ thread.replies.count }} repl{{ thread.replies.count|pluralize:"y,ies" }}
+                            <h5>
+                                <a href="{% url 'discussions:thread_detail' thread.pk %}">
+                                    {{ thread.title }}
+                                </a>
+                            </h5>
+
+                            <p>{{ thread.content|truncatechars:180 }}</p>
+
+                            <div class="ca-thread-meta">
+                                <span>Posted by {{ thread.created_by.full_name|default:thread.created_by.username }}</span>
+                                <span>{{ thread.created_at|date:"M d, Y h:i A" }}</span>
+                                <span>{{ thread.replies.count }} repl{{ thread.replies.count|pluralize:"y,ies" }}</span>
                             </div>
                         </div>
 
-                        <a href="{% url 'discussions:thread_detail' thread.pk %}" class="btn btn-outline-primary btn-sm">
-                            Open Thread
-                        </a>
-                    </div>
-
-                    <p class="text-muted mt-3 mb-0">{{ thread.content|truncatechars:220 }}</p>
-                </div>
+                        <div class="ca-thread-action">
+                            <a href="{% url 'discussions:thread_detail' thread.pk %}" class="btn btn-sm btn-outline-primary">
+                                Open Thread
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
             </div>
-        {% endfor %}
+        {% else %}
+            <div class="ca-empty-state">
+                No discussion threads have been created for this course yet.
+            </div>
+        {% endif %}
     </div>
-{% else %}
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
-            <h5 class="mb-2">No discussion threads yet</h5>
-            <p class="text-muted mb-0">Be the first to start a course discussion.</p>
-        </div>
-    </div>
-{% endif %}
+</div>
 {% endblock %}

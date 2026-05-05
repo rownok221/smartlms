@@ -3,113 +3,106 @@
 {% block title %}Consultations | ClassADDA{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
-    <div>
-        <span class="badge bg-primary mb-2">{{ course.code }}</span>
-        <h1 class="h2 mb-1">Consultation Requests</h1>
-        <p class="text-muted mb-0">
-            Request and manage academic support sessions for {{ course.title }}.
-        </p>
-    </div>
+<div class="container ca-shell ca-workflow-wrap">
+    <section class="ca-page-hero">
+        <div>
+            <span class="ca-course-code">{{ course.code }}</span>
+            <h1>Consultation Hours</h1>
+            <p>Request instructor support, review scheduled sessions, and manage academic consultation requests.</p>
+        </div>
 
-    <div class="d-flex gap-2 flex-wrap">
-        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-secondary">
-            Back to Course
-        </a>
-
-        {% if can_request_consultation %}
-            <a href="{% url 'consultations:consultation_request_create' course.pk %}" class="btn btn-primary">
-                Request Consultation
+        <div class="ca-page-hero-actions">
+            <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-ca-light">
+                Back to Course
             </a>
-        {% endif %}
-    </div>
-</div>
 
-{% if consultations %}
-    <div class="d-flex flex-column gap-3">
-        {% for consultation in consultations %}
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-                        <div>
+            {% if can_request_consultation %}
+                <a href="{% url 'consultations:consultation_request_create' course.pk %}" class="btn btn-ca-gold">
+                    Request Consultation
+                </a>
+            {% endif %}
+        </div>
+    </section>
+
+    <div class="ca-panel">
+        <div class="ca-panel-header">
+            <div>
+                <h5>
+                    {% if can_manage_consultations %}
+                        Consultation Requests
+                    {% else %}
+                        My Consultation Requests
+                    {% endif %}
+                </h5>
+                <p>Track request status, preferred time, scheduled time, and instructor responses.</p>
+            </div>
+        </div>
+
+        {% if consultation_requests %}
+            <div class="ca-list-stack">
+                {% for item in consultation_requests %}
+                    <article class="ca-request-card">
+                        <div class="ca-request-main">
                             <div class="d-flex gap-2 flex-wrap mb-2">
-                                {% if consultation.status == 'PENDING' %}
-                                    <span class="badge bg-warning text-dark">Pending</span>
-                                {% elif consultation.status == 'ACCEPTED' %}
-                                    <span class="badge bg-success">Accepted</span>
-                                {% elif consultation.status == 'RESCHEDULED' %}
-                                    <span class="badge bg-info text-dark">Rescheduled</span>
-                                {% elif consultation.status == 'REJECTED' %}
-                                    <span class="badge bg-danger">Rejected</span>
-                                {% elif consultation.status == 'COMPLETED' %}
-                                    <span class="badge bg-secondary">Completed</span>
-                                {% endif %}
-
-                                <span class="badge bg-light text-dark border">
-                                    {{ consultation.get_mode_display }}
-                                </span>
-                            </div>
-
-                            <h5 class="mb-1">{{ consultation.topic }}</h5>
-
-                            <div class="small text-muted mb-2">
-                                Student: {{ consultation.student.full_name|default:consultation.student.username }}
-                                • Requested: {{ consultation.created_at|date:"M d, Y h:i A" }}
-                            </div>
-
-                            <p class="mb-2 text-muted">{{ consultation.description|linebreaksbr }}</p>
-
-                            <div class="small">
-                                <div><strong>Preferred Time:</strong> {{ consultation.preferred_datetime|date:"M d, Y h:i A" }}</div>
-
-                                {% if consultation.scheduled_datetime %}
-                                    <div><strong>Scheduled Time:</strong> {{ consultation.scheduled_datetime|date:"M d, Y h:i A" }}</div>
-                                {% endif %}
-
-                                {% if consultation.handled_by %}
-                                    <div><strong>Handled By:</strong> {{ consultation.handled_by.full_name|default:consultation.handled_by.username }}</div>
+                                {% if item.status == 'PENDING' %}
+                                    <span class="ca-status gold">Pending</span>
+                                {% elif item.status == 'ACCEPTED' %}
+                                    <span class="ca-status green">Accepted</span>
+                                {% elif item.status == 'RESCHEDULED' %}
+                                    <span class="ca-status gold">Rescheduled</span>
+                                {% elif item.status == 'REJECTED' %}
+                                    <span class="ca-status red">Rejected</span>
+                                {% elif item.status == 'COMPLETED' %}
+                                    <span class="ca-status gray">Completed</span>
                                 {% endif %}
                             </div>
 
-                            {% if consultation.instructor_note %}
-                                <div class="alert alert-light border mt-3 mb-0">
-                                    <strong>Instructor Note:</strong><br>
-                                    {{ consultation.instructor_note|linebreaksbr }}
+                            <h5>{{ item.topic }}</h5>
+
+                            <div class="ca-muted-line mb-2">
+                                Requested by {{ item.student.full_name|default:item.student.username }}
+                                · {{ item.created_at|date:"M d, Y h:i A" }}
+                            </div>
+
+                            <p>{{ item.description|linebreaksbr }}</p>
+
+                            <div class="ca-info-mini mt-3">
+                                <div>
+                                    <span>Preferred Time</span>
+                                    <strong>{{ item.preferred_datetime|date:"M d, Y h:i A" }}</strong>
+                                </div>
+
+                                {% if item.scheduled_datetime %}
+                                    <div>
+                                        <span>Scheduled Time</span>
+                                        <strong>{{ item.scheduled_datetime|date:"M d, Y h:i A" }}</strong>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if item.instructor_note %}
+                                <div class="ca-note-box mt-3">
+                                    <strong>Instructor Note</strong>
+                                    <p>{{ item.instructor_note|linebreaksbr }}</p>
                                 </div>
                             {% endif %}
                         </div>
 
                         {% if can_manage_consultations %}
-                            <div>
-                                <a href="{% url 'consultations:consultation_respond' consultation.pk %}"
-                                   class="btn btn-outline-primary btn-sm">
+                            <div class="ca-request-action">
+                                <a href="{% url 'consultations:consultation_respond' item.pk %}" class="btn btn-sm btn-outline-primary">
                                     Respond / Update
                                 </a>
                             </div>
                         {% endif %}
-                    </div>
-                </div>
+                    </article>
+                {% endfor %}
             </div>
-        {% endfor %}
+        {% else %}
+            <div class="ca-empty-state">
+                No consultation requests available yet.
+            </div>
+        {% endif %}
     </div>
-{% else %}
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
-            <h5 class="mb-2">No consultation requests yet</h5>
-
-            {% if can_request_consultation %}
-                <p class="text-muted mb-3">
-                    You have not requested any consultation for this course.
-                </p>
-                <a href="{% url 'consultations:consultation_request_create' course.pk %}" class="btn btn-primary">
-                    Request Consultation
-                </a>
-            {% else %}
-                <p class="text-muted mb-0">
-                    No students have requested consultation for this course yet.
-                </p>
-            {% endif %}
-        </div>
-    </div>
-{% endif %}
+</div>
 {% endblock %}
