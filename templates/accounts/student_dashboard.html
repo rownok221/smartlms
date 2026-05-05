@@ -13,7 +13,15 @@
 
         <div class="ca-dashboard-actions">
             <a href="{% url 'courses:course_list' %}" class="btn btn-ca-gold">Open My Courses</a>
-            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-ca-light">Request Support</a>
+            {% if primary_course %}
+    <a href="{% url 'consultations:consultation_request_create' primary_course.pk %}" class="btn btn-outline-ca-light">
+        Request Support
+    </a>
+{% else %}
+    <a href="{% url 'courses:course_list' %}" class="btn btn-outline-ca-light">
+        Request Support
+    </a>
+{% endif %}
         </div>
     </section>
 
@@ -150,11 +158,18 @@
                 </div>
 
                 <div class="ca-quick-grid">
-                    <a href="{% url 'courses:course_list' %}">View Courses</a>
-                    <a href="{% url 'courses:course_list' %}">Assignments</a>
-                    <a href="{% url 'courses:course_list' %}">Consultation</a>
-                    <a href="{% url 'courses:course_list' %}">Find Mentor</a>
-                </div>
+    <a href="{% url 'courses:course_list' %}">View Courses</a>
+
+    {% if primary_course %}
+        <a href="{% url 'assignments:assignment_list' primary_course.pk %}">Assignments</a>
+        <a href="{% url 'consultations:consultation_request_create' primary_course.pk %}">Request Consultation</a>
+        <a href="{% url 'mentorship:mentor_list' primary_course.pk %}">Find Mentor</a>
+    {% else %}
+        <a href="{% url 'courses:course_list' %}">Assignments</a>
+        <a href="{% url 'courses:course_list' %}">Request Consultation</a>
+        <a href="{% url 'courses:course_list' %}">Find Mentor</a>
+    {% endif %}
+</div>
             </div>
         </div>
     </div>

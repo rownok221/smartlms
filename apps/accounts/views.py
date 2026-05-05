@@ -94,6 +94,7 @@ def instructor_dashboard(request):
     assigned_courses = Course.objects.filter(
         course_instructors__instructor=request.user
     ).distinct()
+    primary_course = assigned_courses.first()
 
     recent_announcements = Announcement.objects.filter(
         course__course_instructors__instructor=request.user
@@ -104,6 +105,7 @@ def instructor_dashboard(request):
     ).select_related('assignment', 'student').distinct().order_by('-submitted_at')[:5]
 
     context = {
+        'primary_course': primary_course,
         'page_title': 'Instructor Dashboard',
         'assigned_courses': assigned_courses[:4],
         'assigned_course_count': assigned_courses.count(),
@@ -154,7 +156,7 @@ def student_dashboard(request):
     enrolled_courses = Course.objects.filter(
         enrollments__student=request.user
     ).distinct()
-
+    primary_course = enrolled_courses.first()
     recent_announcements = Announcement.objects.filter(
         course__enrollments__student=request.user
     ).select_related('course', 'posted_by').distinct()[:5]
@@ -164,6 +166,7 @@ def student_dashboard(request):
     ).select_related('course').distinct().order_by('deadline')[:5]
 
     context = {
+        'primary_course': primary_course,
         'page_title': 'Student Dashboard',
         'enrolled_courses': enrolled_courses[:4],
         'upcoming_assignments': upcoming_assignments,

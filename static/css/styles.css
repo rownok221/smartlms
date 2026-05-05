@@ -1664,3 +1664,117 @@ body {
     margin: 0;
     line-height: 1.6;
 }
+/* Floating action feedback toasts */
+
+.ca-toast-container {
+    z-index: 1080;
+    margin-top: 5rem;
+}
+
+.ca-toast {
+    min-width: 320px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--ca-border);
+    box-shadow: var(--ca-shadow-md);
+}
+
+.ca-toast .toast-header {
+    background: #ffffff;
+    border-bottom: 1px solid var(--ca-border);
+    color: var(--ca-text);
+    font-weight: 800;
+}
+
+.ca-toast .toast-body {
+    background: #ffffff;
+    color: var(--ca-text);
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.ca-toast-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    display: inline-block;
+    margin-right: 0.55rem;
+    background: var(--ca-green);
+}
+
+.ca-toast-success .ca-toast-dot {
+    background: var(--ca-green);
+}
+
+.ca-toast-error .ca-toast-dot,
+.ca-toast-danger .ca-toast-dot {
+    background: var(--ca-red);
+}
+
+.ca-toast-warning .ca-toast-dot {
+    background: var(--ca-gold);
+}
+
+.ca-toast-success {
+    border-left: 5px solid var(--ca-green);
+}
+
+.ca-toast-error,
+.ca-toast-danger {
+    border-left: 5px solid var(--ca-red);
+}
+
+.ca-toast-warning {
+    border-left: 5px solid var(--ca-gold);
+}
+
+@media (max-width: 575.98px) {
+    .ca-toast-container {
+        left: 0;
+        right: 0;
+        top: 0;
+        margin-top: 4.5rem;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .ca-toast {
+        min-width: 100%;
+        width: 100%;
+    }
+}
+/* Final course and dashboard action polish */
+
+.ca-course-hub-btn {
+    background: linear-gradient(180deg, var(--ca-green), var(--ca-green-dark));
+    border: 1px solid var(--ca-green-dark);
+    color: #ffffff !important;
+    border-radius: 14px;
+    font-weight: 900;
+    min-height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 22px rgba(15, 138, 43, 0.18);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.ca-course-hub-btn:hover {
+    background: linear-gradient(180deg, var(--ca-green-dark), #063f15);
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(15, 138, 43, 0.24);
+}
+
+.ca-course-hub-btn:focus {
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.2rem rgba(15, 138, 43, 0.18);
+}
+
+.ca-quick-grid a {
+    cursor: pointer;
+}
+
+.ca-quick-grid a:hover {
+    text-decoration: none;
+}

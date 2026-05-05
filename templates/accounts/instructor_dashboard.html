@@ -150,11 +150,18 @@
                 </div>
 
                 <div class="ca-quick-grid">
-                    <a href="{% url 'courses:course_list' %}">Manage Courses</a>
-                    <a href="{% url 'courses:course_list' %}">Create Assignment</a>
-                    <a href="{% url 'courses:course_list' %}">Post Notice</a>
-                    <a href="{% url 'courses:course_list' %}">Review Requests</a>
-                </div>
+    <a href="{% url 'courses:course_list' %}">Manage Courses</a>
+
+    {% if primary_course %}
+        <a href="{% url 'assignments:assignment_create' primary_course.pk %}">Create Assignment</a>
+        <a href="{% url 'courses:announcement_create' primary_course.pk %}">Post Notice</a>
+        <a href="{% url 'consultations:consultation_list' primary_course.pk %}">Review Requests</a>
+    {% else %}
+        <a href="{% url 'courses:course_list' %}">Create Assignment</a>
+        <a href="{% url 'courses:course_list' %}">Post Notice</a>
+        <a href="{% url 'courses:course_list' %}">Review Requests</a>
+    {% endif %}
+</div>
             </div>
         </div>
     </div>

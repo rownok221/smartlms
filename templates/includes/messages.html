@@ -1,10 +1,37 @@
 {% if messages %}
-    <div class="mb-3">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<div class="ca-toast-container position-fixed top-0 end-0 p-3">
+    {% for message in messages %}
+        <div class="toast ca-toast ca-toast-{{ message.tags|default:'info' }}"
+             role="alert"
+             aria-live="assertive"
+             aria-atomic="true"
+             data-bs-delay="3500">
+
+            <div class="toast-header">
+                <span class="ca-toast-dot"></span>
+
+                <strong class="me-auto">
+                    {% if 'success' in message.tags %}
+                        Success
+                    {% elif 'error' in message.tags %}
+                        Action Failed
+                    {% elif 'warning' in message.tags %}
+                        Warning
+                    {% else %}
+                        Notification
+                    {% endif %}
+                </strong>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="toast"
+                        aria-label="Close"></button>
             </div>
-        {% endfor %}
-    </div>
+
+            <div class="toast-body">
+                {{ message }}
+            </div>
+        </div>
+    {% endfor %}
+</div>
 {% endif %}
