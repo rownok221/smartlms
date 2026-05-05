@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 
 from .models import ConsultationRequest
 
@@ -14,19 +15,16 @@ class ConsultationRequestForm(forms.ModelForm):
 
     class Meta:
         model = ConsultationRequest
-        fields = ['topic', 'description', 'preferred_datetime', 'mode']
+        fields = ['topic', 'description', 'preferred_datetime']
         widgets = {
             'topic': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Example: Need help understanding ER diagrams',
+                'placeholder': 'Example: Need help understanding assignment requirements',
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Briefly explain what you need help with',
                 'rows': 5,
-            }),
-            'mode': forms.Select(attrs={
-                'class': 'form-select',
+                'placeholder': 'Briefly explain what you need help with.',
             }),
         }
 
@@ -50,32 +48,14 @@ class ConsultationResponseForm(forms.ModelForm):
             }),
             'instructor_note': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Write a note for the student',
                 'rows': 5,
+                'placeholder': 'Add a response note for the student.',
             }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['status'].choices = [
-            (ConsultationRequest.Status.ACCEPTED, "Accepted"),
-            (ConsultationRequest.Status.RESCHEDULED, "Rescheduled"),
-            (ConsultationRequest.Status.REJECTED, "Rejected"),
-            (ConsultationRequest.Status.COMPLETED, "Completed"),
-        ]
-
-    def clean(self):
-        cleaned_data = super().clean()
-        status = cleaned_data.get('status')
-        scheduled_datetime = cleaned_data.get('scheduled_datetime')
-
-        if status in [
-            ConsultationRequest.Status.ACCEPTED,
-            ConsultationRequest.Status.RESCHEDULED,
-        ] and not scheduled_datetime:
-            raise forms.ValidationError(
-                "A scheduled date and time is required when accepting or rescheduling a consultation."
-            )
-
-        return cleaned_data
+        if self.instance and self.instance.pk and self.instance.scheduled_datetime:
+            scheduled = timezone.localtime(self.instance.scheduled_datetime)
+            self.initial['scheduled_datetime'] = scheduled.strftime('%Y-%m-%dT%H:%M')

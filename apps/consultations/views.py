@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
@@ -15,30 +13,26 @@ def is_admin(user):
     return user.is_superuser or user.role == User.Role.ADMIN
 
 
-def is_instructor(user):
-    return user.role == User.Role.INSTRUCTOR
+def is_instructor_for_course(user, course):
+    return CourseInstructor.objects.filter(
+        course=course,
+        instructor=user
+    ).exists()
 
 
-def is_student(user):
-    return user.role == User.Role.STUDENT
+def is_enrolled_student(user, course):
+    return Enrollment.objects.filter(
+        course=course,
+        student=user
+    ).exists()
 
 
 def can_access_course(user, course):
-    if is_admin(user):
-        return True
-    if is_instructor(user):
-        return CourseInstructor.objects.filter(course=course, instructor=user).exists()
-    if is_student(user):
-        return Enrollment.objects.filter(course=course, student=user).exists()
-    return False
-
-
-def can_manage_course(user, course):
-    if is_admin(user):
-        return True
-    if is_instructor(user):
-        return CourseInstructor.objects.filter(course=course, instructor=user).exists()
-    return False
+    return (
+        is_admin(user)
+        or is_instructor_for_course(user, course)
+        or is_enrolled_student(user, course)
+    )
 
 
 @login_required
@@ -46,24 +40,27 @@ def consultation_list(request, course_pk):
     course = get_object_or_404(Course, pk=course_pk)
 
     if not can_access_course(request.user, course):
-        messages.error(request, 'You are not authorized to view consultations for this course.')
+        messages.error(request, 'You are not authorized to view consultation requests for this course.')
         return redirect('courses:course_list')
 
-    if can_manage_course(request.user, course):
-        consultations = ConsultationRequest.objects.filter(
+    can_manage_consultations = is_admin(request.user) or is_instructor_for_course(request.user, course)
+    can_request_consultation = is_enrolled_student(request.user, course)
+
+    if can_manage_consultations:
+        consultation_requests = ConsultationRequest.objects.filter(
             course=course
-        ).select_related('student', 'handled_by')
+        ).select_related('student').order_by('-created_at')
     else:
-        consultations = ConsultationRequest.objects.filter(
+        consultation_requests = ConsultationRequest.objects.filter(
             course=course,
             student=request.user
-        ).select_related('student', 'handled_by')
+        ).select_related('student').order_by('-created_at')
 
     context = {
         'course': course,
-        'consultations': consultations,
-        'can_manage_consultations': can_manage_course(request.user, course),
-        'can_request_consultation': is_student(request.user),
+        'consultation_requests': consultation_requests,
+        'can_manage_consultations': can_manage_consultations,
+        'can_request_consultation': can_request_consultation,
     }
     return render(request, 'consultations/consultation_list.html', context)
 
@@ -72,24 +69,24 @@ def consultation_list(request, course_pk):
 def consultation_request_create(request, course_pk):
     course = get_object_or_404(Course, pk=course_pk)
 
-    if not is_student(request.user):
-        messages.error(request, 'Only students can request consultations.')
+    if not is_enrolled_student(request.user, course):
+        messages.error(request, 'Only enrolled students can request consultations for this course.')
         return redirect('consultations:consultation_list', course_pk=course.pk)
-
-    if not Enrollment.objects.filter(course=course, student=request.user).exists():
-        messages.error(request, 'You are not enrolled in this course.')
-        return redirect('courses:course_list')
 
     if request.method == 'POST':
         form = ConsultationRequestForm(request.POST)
+
         if form.is_valid():
-            consultation = form.save(commit=False)
-            consultation.course = course
-            consultation.student = request.user
-            consultation.save()
+            consultation_request = form.save(commit=False)
+            consultation_request.course = course
+            consultation_request.student = request.user
+            consultation_request.status = ConsultationRequest.Status.PENDING
+            consultation_request.save()
 
             messages.success(request, 'Consultation request submitted successfully.')
             return redirect('consultations:consultation_list', course_pk=course.pk)
+
+        messages.error(request, 'Please correct the errors below and submit again.')
     else:
         form = ConsultationRequestForm()
 
@@ -102,67 +99,31 @@ def consultation_request_create(request, course_pk):
 
 @login_required
 def consultation_respond(request, pk):
-    consultation = get_object_or_404(
-        ConsultationRequest.objects.select_related('course', 'student', 'handled_by'),
+    consultation_request = get_object_or_404(
+        ConsultationRequest.objects.select_related('course', 'student'),
         pk=pk
     )
-    course = consultation.course
+    course = consultation_request.course
 
-    if not can_manage_course(request.user, course):
+    if not (is_admin(request.user) or is_instructor_for_course(request.user, course)):
         messages.error(request, 'You are not authorized to respond to this consultation request.')
         return redirect('consultations:consultation_list', course_pk=course.pk)
 
     if request.method == 'POST':
-        form = ConsultationResponseForm(request.POST, instance=consultation)
+        form = ConsultationResponseForm(request.POST, instance=consultation_request)
+
         if form.is_valid():
-            updated_consultation = form.save(commit=False)
-
-            scheduled_datetime = updated_consultation.scheduled_datetime
-            status = updated_consultation.status
-
-            if status in [
-                ConsultationRequest.Status.ACCEPTED,
-                ConsultationRequest.Status.RESCHEDULED,
-            ] and scheduled_datetime:
-                conflict_start = scheduled_datetime - timedelta(minutes=30)
-                conflict_end = scheduled_datetime + timedelta(minutes=30)
-
-                has_conflict = ConsultationRequest.objects.filter(
-                    handled_by=request.user,
-                    scheduled_datetime__gte=conflict_start,
-                    scheduled_datetime__lte=conflict_end,
-                    status__in=[
-                        ConsultationRequest.Status.ACCEPTED,
-                        ConsultationRequest.Status.RESCHEDULED,
-                    ],
-                ).exclude(pk=consultation.pk).exists()
-
-                if has_conflict:
-                    messages.error(
-                        request,
-                        'Scheduling conflict detected. You already have another consultation around this time.'
-                    )
-                    return render(
-                        request,
-                        'consultations/consultation_response_form.html',
-                        {
-                            'course': course,
-                            'consultation': consultation,
-                            'form': form,
-                        }
-                    )
-
-            updated_consultation.handled_by = request.user
-            updated_consultation.save()
-
+            form.save()
             messages.success(request, 'Consultation request updated successfully.')
             return redirect('consultations:consultation_list', course_pk=course.pk)
+
+        messages.error(request, 'Please correct the errors below and submit again.')
     else:
-        form = ConsultationResponseForm(instance=consultation)
+        form = ConsultationResponseForm(instance=consultation_request)
 
     context = {
         'course': course,
-        'consultation': consultation,
+        'consultation_request': consultation_request,
         'form': form,
     }
     return render(request, 'consultations/consultation_response_form.html', context)
