@@ -1,0 +1,237 @@
+/* =========================================================
+   ClassADDA Global Animation Layer
+   Lightweight, safe, reusable across all pages
+   ========================================================= */
+
+/* Page entrance */
+
+body {
+    animation: ca-page-fade-in 0.35s ease-out both;
+}
+
+@keyframes ca-page-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Auto reveal base */
+
+.ca-animate {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+        opacity 0.55s ease,
+        transform 0.55s ease;
+}
+
+.ca-animate.ca-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hero animation */
+
+.ca-page-hero,
+.ca-home-hero,
+.ca-auth-section {
+    animation: ca-hero-rise 0.55s ease-out both;
+}
+
+@keyframes ca-hero-rise {
+    from {
+        opacity: 0;
+        transform: translateY(22px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Panels, cards, lists */
+
+.ca-panel,
+.ca-card,
+.ca-course-card,
+.ca-stat-card,
+.ca-dashboard-card,
+.ca-auth-card,
+.ca-feature-card,
+.ca-list-item,
+.ca-submission-card,
+.ca-grade-card,
+.ca-note-box,
+.ca-info-list > div,
+.ca-attachment-box,
+.ca-empty-state {
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        background-color 0.22s ease;
+}
+
+.ca-panel:hover,
+.ca-course-card:hover,
+.ca-stat-card:hover,
+.ca-dashboard-card:hover,
+.ca-feature-card:hover,
+.ca-list-item:hover,
+.ca-submission-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px rgba(16, 24, 40, 0.12);
+}
+
+/* Buttons */
+
+.btn,
+.ca-quick-grid a,
+.ca-course-hub-btn {
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.btn:hover,
+.ca-quick-grid a:hover,
+.ca-course-hub-btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active,
+.ca-quick-grid a:active,
+.ca-course-hub-btn:active {
+    transform: translateY(0);
+}
+
+/* Navbar links */
+
+.navbar a,
+.ca-navbar a,
+.ca-nav-link {
+    transition:
+        color 0.18s ease,
+        background-color 0.18s ease,
+        border-color 0.18s ease;
+}
+
+/* Forms */
+
+input,
+textarea,
+select,
+.form-control,
+.form-select {
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease;
+}
+
+/* File upload / attachment item */
+
+.ca-attachment-item {
+    transition:
+        transform 0.18s ease,
+        background-color 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.ca-attachment-item:hover {
+    transform: translateX(3px);
+    background-color: #F8FAF8;
+}
+
+/* Quick action cards */
+
+.ca-quick-grid a {
+    position: relative;
+    overflow: hidden;
+}
+
+.ca-quick-grid a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.35),
+        transparent
+    );
+    transform: translateX(-120%);
+    transition: transform 0.55s ease;
+}
+
+.ca-quick-grid a:hover::after {
+    transform: translateX(120%);
+}
+
+/* Toast animation improvement */
+
+.ca-toast {
+    animation: ca-toast-slide-in 0.35s ease-out both;
+}
+
+@keyframes ca-toast-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Submit loading state */
+
+.ca-btn-loading {
+    pointer-events: none;
+    opacity: 0.75;
+    position: relative;
+}
+
+.ca-btn-loading::after {
+    content: "";
+    width: 14px;
+    height: 14px;
+    margin-left: 8px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: -2px;
+    animation: ca-spin 0.65s linear infinite;
+}
+
+@keyframes ca-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Respect reduced motion accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+    }
+
+    .ca-animate {
+        opacity: 1;
+        transform: none;
+    }
+}
