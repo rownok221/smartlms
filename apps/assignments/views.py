@@ -77,33 +77,52 @@ def assignment_list(request, course_pk):
 
 
 @login_required
+@login_required
 def assignment_detail(request, pk):
     assignment = get_object_or_404(
-    Assignment.objects.select_related(
-        'course',
-        'created_by'
-    ).prefetch_related('attachments'),
-    pk=pk
-)
+        Assignment.objects.select_related(
+            'course',
+            'created_by'
+        ).prefetch_related('attachments'),
+        pk=pk
+    )
     course = assignment.course
 
     if not can_access_course(request.user, course):
         messages.error(request, 'You are not authorized to view this assignment.')
         return redirect('courses:course_list')
 
-    student_submission = None
-    all_submissions = None
+    submission = None
+    submissions = None
+    grade = None
 
     if is_student(request.user):
-        student_submission = Submission.objects.filter(
+        submission = Submission.objects.filter(
             assignment=assignment,
             student=request.user
         ).select_related('grade').first()
 
+        if submission and hasattr(submission, 'grade'):
+            grade = submission.grade
+
     if can_manage_course(request.user, course):
-        all_submissions = Submission.objects.filter(
+        submissions = Submission.objects.filter(
             assignment=assignment
-        ).select_related('student').prefetch_related('grade')
+        ).select_related(
+            'student'
+        ).prefetch_related(
+            'grade'
+        ).order_by('-last_updated_at')
+
+    context = {
+        'assignment': assignment,
+        'submission': submission,
+        'submissions': submissions,
+        'grade': grade,
+        'can_manage_assignment': can_manage_course(request.user, course),
+        'can_submit': is_student(request.user),
+    }
+    return render(request, 'assignments/assignment_detail.html', context)
 
     context = {
         'assignment': assignment,
@@ -209,6 +228,7 @@ def assignment_attachment_delete(request, pk):
     return redirect('assignments:assignment_detail', pk=assignment.pk)
 
 @login_required
+@login_required
 def submit_assignment(request, pk):
     assignment = get_object_or_404(
         Assignment.objects.select_related('course'),
@@ -235,25 +255,38 @@ def submit_assignment(request, pk):
             request.FILES,
             instance=existing_submission
         )
+
         if form.is_valid():
             submission = form.save(commit=False)
             submission.assignment = assignment
             submission.student = request.user
-            submission.status = (
-                Submission.Status.LATE
-                if timezone.now() > assignment.deadline
-                else Submission.Status.SUBMITTED
-            )
+
+            if timezone.now() > assignment.deadline:
+                submission.status = Submission.Status.LATE
+            else:
+                submission.status = Submission.Status.SUBMITTED
+
             submission.save()
 
             if submission.status == Submission.Status.LATE:
-                messages.warning(request, 'Submission saved, but it was marked as late.')
+                messages.warning(request, 'Submission uploaded successfully, but it was marked as late.')
             else:
-                messages.success(request, 'Submission uploaded successfully.')
+                messages.success(request, 'Assignment submitted successfully.')
 
             return redirect('assignments:assignment_detail', pk=assignment.pk)
+
+        messages.error(request, 'Please upload a valid submission file and try again.')
+
     else:
         form = SubmissionForm(instance=existing_submission)
+
+    context = {
+        'assignment': assignment,
+        'course': course,
+        'form': form,
+        'existing_submission': existing_submission,
+    }
+    return render(request, 'assignments/submission_form.html', context)
 
     context = {
         'assignment': assignment,
