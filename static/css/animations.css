@@ -235,3 +235,75 @@ select,
         transform: none;
     }
 }
+/* =========================================================
+   Animated dashboard counters + active navigation
+   ========================================================= */
+
+/* Counter polish */
+
+.ca-counter {
+    display: inline-block;
+    animation: ca-counter-pop 0.45s ease-out both;
+}
+
+@keyframes ca-counter-pop {
+    0% {
+        transform: translateY(4px) scale(0.96);
+        opacity: 0.45;
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Active navbar state */
+
+.ca-nav-active {
+    position: relative;
+    color: var(--ca-gold, #E0B100) !important;
+    font-weight: 900 !important;
+}
+
+.ca-nav-active::after {
+    content: "";
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    bottom: -8px;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--ca-gold, #E0B100);
+    box-shadow: 0 4px 12px rgba(224, 177, 0, 0.35);
+}
+
+/* For pill-style nav buttons */
+
+.btn.ca-nav-active,
+.ca-nav-active.btn {
+    background: var(--ca-gold, #E0B100) !important;
+    border-color: var(--ca-gold, #E0B100) !important;
+    color: #111827 !important;
+}
+
+.btn.ca-nav-active::after,
+.ca-nav-active.btn::after {
+    display: none;
+}
+
+/* Header-specific safety */
+
+header .ca-nav-active,
+.navbar .ca-nav-active,
+.ca-navbar .ca-nav-active {
+    text-decoration: none !important;
+}
+
+/* Reduce motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .ca-counter {
+        animation: none !important;
+    }
+}
